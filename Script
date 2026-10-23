@@ -485,7 +485,7 @@ btnTpDrn.MouseButton1Click:Connect(function()
     if bestPos then myChar.HumanoidRootPart.CFrame = CFrame.new(bestPos + Vector3.new(0, 3, 0)) end
 end)
 
--- НОВАЯ ФУНКЦИЯ ТЕЛЕПОРТА С УЧЕТОМ СКРИПТА RPGHit и ТОЧЕЧНЫМ КАСАНИЕМ
+-- ФИКС: УДАЛЯЕМ СТАБИЛИЗАТОРЫ И ТЕЛЕПОРТИРУЕМ
 local function tpDroneToEnemy(specificDrone)
     local myChar = LP.Character
     if not myChar or not myChar:FindFirstChild("HumanoidRootPart") then return end
@@ -530,21 +530,27 @@ local function tpDroneToEnemy(specificDrone)
     if myDrone then
         local body = myDrone:FindFirstChild("Body") or myDrone.PrimaryPart or myDrone:FindFirstChildWhichIsA("BasePart")
         if body then
-            -- 1. Забираем права на физику себе, чтобы сервер не блокировал ТП
-            pcall(function() body:SetNetworkOwner(LP) end)
+            -- 1. Уничтожаем все стабилизаторы, чтобы дрон не улетал вверх и не сопротивлялся ТП
+            for _, child in pairs(myDrone:GetDescendants()) do
+                if child:IsA("BodyVelocity") or child:IsA("BodyGyro") or child:IsA("AlignPosition") or child:IsA("AlignOrientation") then
+                    child:Destroy()
+                end
+            end
             
-            -- 2. Телепортируем прямо в игрока (в его хитбокс)
+            -- 2. Телепортируем прямо в игрока
             myDrone:PivotTo(CFrame.new(closestEnemy.Position))
             
-            -- 3. Вызываем Touched для ВСЕХ частей тела врага и детали Body дрона
+            -- 3. Ждем долю секунды, чтобы сервер понял, что дрон переместился
+            task.wait(0.25)
+            
+            -- 4. Вызываем Touched для всех частей тела врага и детали Body дрона
             task.spawn(function()
-                task.wait(0.05) -- Ждем физику
                 for _, targetPart in pairs(closestEnemy.Parent:GetDescendants()) do
                     if targetPart:IsA("BasePart") then
                         pcall(function()
-                            firetouchinterest(body, targetPart, 0) -- Начало касания
+                            firetouchinterest(body, targetPart, 0)
                             task.wait()
-                            firetouchinterest(body, targetPart, 1) -- Конец касания
+                            firetouchinterest(body, targetPart, 1)
                         end)
                     end
                 end
