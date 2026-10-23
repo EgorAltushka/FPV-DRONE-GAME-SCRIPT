@@ -36,9 +36,6 @@ local function main()
     local extTPEnabled = false
     local extRefillEnabled = false
 
-    local thirdPersonEnabled = false
-    local cameraZoom = 50
-
     -- Auto Farm
     local autoFarmEnabled = false
     local AK74ShootRemote = ReplicatedStorage:FindFirstChild("AK74ShootRemote_R1")
@@ -46,8 +43,8 @@ local function main()
     local isReloadingFarm, isDeadFarm, lastActionTimeFarm = false, false, 0
 
     local lang = {
-        ru = {v="Визуал", m="Движение", f="Бой", mel="Меллстрой", misc="Разное", farm="Авто-Фарм", l="Язык", s="Настройки", inf="Инфо", p="Люди: ", d="Дроны: ", dist="Дистанция: ", opt="Оптимизация: ", time="Время: ", fly="Полет: ", spd="Скорость: ", fly_spd="Скор. полета: ", jmp="Прыжок: ", spin="Спин: ", warn="Включите ESP Дронов!", del="УДАЛИТЬ СКРИПТ", on="ВКЛ", off="ВЫКЛ", move_title="Движение", world_title="Мир / World", cam_title="Камера", fov="FOV: ", tp_cam="Третье лицо: ", zoom="Зум: ", fight_title="Бой / Fight", esp_title="ESP", sa="Aimlock: ", sa_t="Цель: ", sa_fov="FOV Aim: ", sa_pr="Предикт: ", sa_vis="Только видимые: ", t_people="Люди", t_drones="Дроны", t_both="Оба", cfg_name="Имя конфига:", cfg_save="СОХРАНИТЬ", cfg_load="ЗАГРУЗИТЬ", cfg_saved="Сохранено!", cfg_loaded="Загружено!", cfg_err="Ошибка!", tp_title="Телепорт", tp_plr="ТП к ближ. игроку", tp_drn="ТП к ближ. дрону", ext_tp="Внешняя ТП: ", ext_refill="Внешняя пополнение: ", ext_tp_info="(Только к людям)", other_title="Прочее", anti_afk="Anti-AFK: ", color="Цвет: ", wm="Водяной знак (FPS): ", weather="Погода: ", w_off="ВЫКЛ", w_snow="СНЕГ", w_rain="ДОЖДЬ", plist="Игроки (ТП):", refill="Пополнить дроны (ТП)", kf="Лог смертей: ", info_title="Мой Телеграм:", copy_msg="Ссылка скопирована!", farm_warn="ВНИМАНИЕ: Нужен АК-74 в рюкзаке!", farm_btn="АВТО-ФАРМ: "},
-        en = {v="Visuals", m="Movement", f="Fight", mel="Mellstroy", misc="Misc", farm="Auto-Farm", l="Language", s="Settings", inf="Info", p="People: ", d="Drones: ", dist="Distance: ", opt="Optimization: ", time="Time: ", fly="Fly: ", spd="Speed: ", fly_spd="Fly Speed: ", jmp="Jump: ", spin="Spin: ", warn="Enable Drone ESP!", del="DELETE SCRIPT", on="ON", off="OFF", move_title="Movement", world_title="World", cam_title="Camera", fov="FOV: ", tp_cam="Third Person: ", zoom="Zoom: ", fight_title="Fight", esp_title="ESP", sa="Aimlock: ", sa_t="Target: ", sa_fov="FOV Aim: ", sa_pr="Predict: ", sa_vis="Only Visible: ", t_people="People", t_drones="Drones", t_both="Both", cfg_name="Config Name:", cfg_save="SAVE", cfg_load="LOAD", cfg_saved="Saved!", cfg_loaded="Loaded!", cfg_err="Error!", tp_title="Teleport", tp_plr="TP to nearest player", tp_drn="TP to nearest drone", ext_tp="External TP: ", ext_refill="Ext Refill: ", ext_tp_info="(People only)", other_title="Other", anti_afk="Anti-AFK: ", color="Color: ", wm="Watermark (FPS): ", weather="Weather: ", w_off="OFF", w_snow="SNOW", w_rain="RAIN", plist="Players (TP):", refill="Refill drones (TP)", kf="Kill Feed: ", info_title="My Telegram:", copy_msg="Link copied!", farm_warn="WARNING: Need AK-74 in backpack!", farm_btn="AUTO-FARM: "}
+        ru = {v="Визуал", m="Движение", f="Бой", mel="Меллстрой", misc="Разное", farm="Авто-Фарм", l="Язык", s="Настройки", inf="Инфо", p="Люди: ", d="Дроны: ", dist="Дистанция: ", opt="Оптимизация: ", time="Время: ", fly="Полет: ", spd="Скорость: ", fly_spd="Скор. полета: ", jmp="Прыжок: ", spin="Спин: ", warn="Включите ESP Дронов!", del="УДАЛИТЬ СКРИПТ", on="ВКЛ", off="ВЫКЛ", move_title="Движение", world_title="Мир / World", cam_title="Камера", fov="FOV: ", fight_title="Бой / Fight", esp_title="ESP", sa="Aimlock: ", sa_t="Цель: ", sa_fov="FOV Aim: ", sa_pr="Предикт: ", sa_vis="Только видимые: ", t_people="Люди", t_drones="Дроны", t_both="Оба", cfg_name="Имя конфига:", cfg_save="СОХРАНИТЬ", cfg_load="ЗАГРУЗИТЬ", cfg_saved="Сохранено!", cfg_loaded="Загружено!", cfg_err="Ошибка!", tp_title="Телепорт", tp_plr="ТП к ближ. игроку", tp_drn="ТП к ближ. дрону", ext_tp="Кнопка ТП: ", ext_refill="Кнопка пополнения: ", other_title="Прочее", anti_afk="Anti-AFK: ", color="Цвет: ", wm="Водяной знак (FPS): ", weather="Погода: ", w_off="ВЫКЛ", w_snow="СНЕГ", w_rain="ДОЖДЬ", plist="Игроки (ТП):", refill="Пополнить дроны (ТП)", kf="Лог смертей: ", info_title="Мой Телеграм:", copy_msg="Ссылка скопирована!", farm_warn="ВНИМАНИЕ: Нужен АК-47!", farm_btn="АВТО-ФАРМ: "},
+        en = {v="Visuals", m="Movement", f="Fight", mel="Mellstroy", misc="Misc", farm="Auto-Farm", l="Language", s="Settings", inf="Info", p="People: ", d="Drones: ", dist="Distance: ", opt="Optimization: ", time="Time: ", fly="Fly: ", spd="Speed: ", fly_spd="Fly Speed: ", jmp="Jump: ", spin="Spin: ", warn="Enable Drone ESP!", del="DELETE SCRIPT", on="ON", off="OFF", move_title="Movement", world_title="World", cam_title="Camera", fov="FOV: ", fight_title="Fight", esp_title="ESP", sa="Aimlock: ", sa_t="Target: ", sa_fov="FOV Aim: ", sa_pr="Predict: ", sa_vis="Only Visible: ", t_people="People", t_drones="Drones", t_both="Both", cfg_name="Config Name:", cfg_save="SAVE", cfg_load="LOAD", cfg_saved="Saved!", cfg_loaded="Loaded!", cfg_err="Error!", tp_title="Teleport", tp_plr="TP to nearest player", tp_drn="TP to nearest drone", ext_tp="TP Button: ", ext_refill="Refill Button: ", other_title="Other", anti_afk="Anti-AFK: ", color="Color: ", wm="Watermark (FPS): ", weather="Weather: ", w_off="OFF", w_snow="SNOW", w_rain="RAIN", plist="Players (TP):", refill="Refill drones (TP)", kf="Kill Feed: ", info_title="My Telegram:", copy_msg="Link copied!", farm_warn="WARNING: Need AK-47!", farm_btn="AUTO-FARM: "}
     }
     local function L(k) return lang[currentLang][k] end
 
@@ -91,9 +88,10 @@ local function main()
     create("UICorner", {CornerRadius=UDim.new(0,12)}, menuImg)
     local menuTxt = create("TextLabel", {Size=UDim2.new(1,0,1,0), BackgroundTransparency=1, Text="PHub", TextColor3=Color3.new(1,1,1), Font=Enum.Font.GothamBlack, TextSize=16, ZIndex=2, TextStrokeTransparency=0, TextStrokeColor3=Color3.new(0,0,0)}, menuBtn)
 
-    local sideBar = create("Frame", {Size=UDim2.new(0,90,1,-35), Position=UDim2.new(0,0,0,35), BackgroundColor3=Color3.fromRGB(25,25,30), BorderSizePixel=0}, main)
+    local sideBar = create("ScrollingFrame", {Size=UDim2.new(0,90,1,-35), Position=UDim2.new(0,0,0,35), BackgroundColor3=Color3.fromRGB(25,25,30), BorderSizePixel=0, ScrollBarThickness=2, CanvasSize=UDim2.new(0,0,0,0), AutomaticCanvasSize=Enum.AutomaticSize.Y, ScrollingDirection=Enum.ScrollingDirection.Y}, main)
     create("UICorner", {CornerRadius=UDim.new(0,10)}, sideBar)
     create("UIListLayout", {Padding=UDim.new(0,2), SortOrder=Enum.SortOrder.LayoutOrder, HorizontalAlignment=Enum.HorizontalAlignment.Center}, sideBar)
+    
     local contentArea = create("Frame", {Size=UDim2.new(1,-90,1,-35), Position=UDim2.new(0,90,0,35), BackgroundColor3=Color3.fromRGB(20,20,25), BorderSizePixel=0}, main)
     create("UICorner", {CornerRadius=UDim.new(0,10)}, contentArea)
 
@@ -159,19 +157,13 @@ local function main()
     local fovSliderFill = create("Frame", {Size=UDim2.new(0/50,0,1,0), BackgroundColor3=Color3.fromRGB(0,150,255), BorderSizePixel=0}, fovSliderBg); create("UICorner", {CornerRadius=UDim.new(0,3)}, fovSliderFill)
     local fovSliderKnob = create("Frame", {Size=UDim2.new(0,16,0,16), Position=UDim2.new(0/50,-8,0.5,-8), BackgroundColor3=Color3.new(1,1,1), BorderSizePixel=0, ZIndex=2}, fovSliderBg); create("UICorner", {CornerRadius=UDim.new(0,8)}, fovSliderKnob)
 
-    local btnThirdPerson = create("TextButton", {Size=UDim2.new(0,220,0,30), BackgroundColor3=Color3.fromRGB(100,100,100), Text="Третье лицо: ВЫКЛ", TextColor3=Color3.new(1,1,1), Font=Enum.Font.GothamBold, TextSize=12, BorderSizePixel=0, LayoutOrder=9}, pageVis); create("UICorner", {CornerRadius=UDim.new(0,6)}, btnThirdPerson)
-    local zoomLabel = create("TextLabel", {Size=UDim2.new(0,220,0,20), BackgroundTransparency=1, Text="Зум: 50", TextColor3=Color3.fromRGB(200,200,200), Font=Enum.Font.Gotham, TextSize=12, TextXAlignment=Enum.TextXAlignment.Left, LayoutOrder=10, Visible=false}, pageVis)
-    local zoomSliderBg = create("Frame", {Size=UDim2.new(0,220,0,6), BackgroundColor3=Color3.fromRGB(60,60,70), BorderSizePixel=0, LayoutOrder=11, Visible=false}, pageVis); create("UICorner", {CornerRadius=UDim.new(0,3)}, zoomSliderBg)
-    local zoomSliderFill = create("Frame", {Size=UDim2.new((50-10)/(150-10),0,1,0), BackgroundColor3=Color3.fromRGB(255,200,0), BorderSizePixel=0}, zoomSliderBg); create("UICorner", {CornerRadius=UDim.new(0,3)}, zoomSliderFill)
-    local zoomSliderKnob = create("Frame", {Size=UDim2.new(0,16,0,16), Position=UDim2.new((50-10)/(150-10),-8,0.5,-8), BackgroundColor3=Color3.new(1,1,1), BorderSizePixel=0, ZIndex=2}, zoomSliderBg); create("UICorner", {CornerRadius=UDim.new(0,8)}, zoomSliderKnob)
-
-    local lblWorld = create("TextLabel", {Size=UDim2.new(0,220,0,20), BackgroundTransparency=1, Text="Мир / World", TextColor3=Color3.new(1,1,1), Font=Enum.Font.GothamBold, TextSize=14, LayoutOrder=12}, pageVis)
-    local optBtn = create("TextButton", {Size=UDim2.new(0,220,0,30), BackgroundColor3=Color3.fromRGB(50,50,60), Text="Оптимизация: ВЫКЛ", TextColor3=Color3.new(1,1,1), Font=Enum.Font.GothamBold, TextSize=12, BorderSizePixel=0, LayoutOrder=13}, pageVis); create("UICorner", {CornerRadius=UDim.new(0,6)}, optBtn)
-    local timeLabel = create("TextLabel", {Size=UDim2.new(0,220,0,20), BackgroundTransparency=1, Text="Время: 14:00", TextColor3=Color3.fromRGB(200,200,200), Font=Enum.Font.Gotham, TextSize=12, TextXAlignment=Enum.TextXAlignment.Left, LayoutOrder=14}, pageVis)
-    local timeSliderBg = create("Frame", {Size=UDim2.new(0,220,0,6), BackgroundColor3=Color3.fromRGB(60,60,70), BorderSizePixel=0, LayoutOrder=15}, pageVis); create("UICorner", {CornerRadius=UDim.new(0,3)}, timeSliderBg)
+    local lblWorld = create("TextLabel", {Size=UDim2.new(0,220,0,20), BackgroundTransparency=1, Text="Мир / World", TextColor3=Color3.new(1,1,1), Font=Enum.Font.GothamBold, TextSize=14, LayoutOrder=9}, pageVis)
+    local optBtn = create("TextButton", {Size=UDim2.new(0,220,0,30), BackgroundColor3=Color3.fromRGB(50,50,60), Text="Оптимизация: ВЫКЛ", TextColor3=Color3.new(1,1,1), Font=Enum.Font.GothamBold, TextSize=12, BorderSizePixel=0, LayoutOrder=10}, pageVis); create("UICorner", {CornerRadius=UDim.new(0,6)}, optBtn)
+    local timeLabel = create("TextLabel", {Size=UDim2.new(0,220,0,20), BackgroundTransparency=1, Text="Время: 14:00", TextColor3=Color3.fromRGB(200,200,200), Font=Enum.Font.Gotham, TextSize=12, TextXAlignment=Enum.TextXAlignment.Left, LayoutOrder=11}, pageVis)
+    local timeSliderBg = create("Frame", {Size=UDim2.new(0,220,0,6), BackgroundColor3=Color3.fromRGB(60,60,70), BorderSizePixel=0, LayoutOrder=12}, pageVis); create("UICorner", {CornerRadius=UDim.new(0,3)}, timeSliderBg)
     local timeSliderFill = create("Frame", {Size=UDim2.new(14/24,0,1,0), BackgroundColor3=Color3.fromRGB(255,200,0), BorderSizePixel=0}, timeSliderBg); create("UICorner", {CornerRadius=UDim.new(0,3)}, timeSliderFill)
     local timeSliderKnob = create("Frame", {Size=UDim2.new(0,16,0,16), Position=UDim2.new(14/24,-8,0.5,-8), BackgroundColor3=Color3.new(1,1,1), BorderSizePixel=0, ZIndex=2}, timeSliderBg); create("UICorner", {CornerRadius=UDim.new(0,8)}, timeSliderKnob)
-    local btnWeather = create("TextButton", {Size=UDim2.new(0,220,0,30), BackgroundColor3=Color3.fromRGB(50,50,60), Text="Погода: ВЫКЛ", TextColor3=Color3.new(1,1,1), Font=Enum.Font.GothamBold, TextSize=12, BorderSizePixel=0, LayoutOrder=16}, pageVis); create("UICorner", {CornerRadius=UDim.new(0,6)}, btnWeather)
+    local btnWeather = create("TextButton", {Size=UDim2.new(0,220,0,30), BackgroundColor3=Color3.fromRGB(50,50,60), Text="Погода: ВЫКЛ", TextColor3=Color3.new(1,1,1), Font=Enum.Font.GothamBold, TextSize=12, BorderSizePixel=0, LayoutOrder=13}, pageVis); create("UICorner", {CornerRadius=UDim.new(0,6)}, btnWeather)
 
     -- MOVEMENT
     local lblMove = create("TextLabel", {Size=UDim2.new(0,220,0,20), BackgroundTransparency=1, Text="Движение", TextColor3=Color3.new(1,1,1), Font=Enum.Font.GothamBold, TextSize=14, LayoutOrder=1}, pageMove)
@@ -216,10 +208,9 @@ local function main()
     
     local btnRefillDrones = create("TextButton", {Size=UDim2.new(0,220,0,35), BackgroundColor3=Color3.fromRGB(50,50,60), Text="Пополнить дроны (ТП)", TextColor3=Color3.new(1,1,1), Font=Enum.Font.GothamBold, TextSize=13, BorderSizePixel=0, LayoutOrder=6}, pageMisc); create("UICorner", {CornerRadius=UDim.new(0,6)}, btnRefillDrones)
 
-    local btnToggleExtTP = create("TextButton", {Size=UDim2.new(0,220,0,35), BackgroundColor3=Color3.fromRGB(100,100,100), Text="Внешняя ТП: ВЫКЛ", TextColor3=Color3.new(1,1,1), Font=Enum.Font.GothamBold, TextSize=13, BorderSizePixel=0, LayoutOrder=7}, pageMisc); create("UICorner", {CornerRadius=UDim.new(0,6)}, btnToggleExtTP)
-    local btnToggleExtRefill = create("TextButton", {Size=UDim2.new(0,220,0,35), BackgroundColor3=Color3.fromRGB(100,100,100), Text="Внешнее Пополнение: ВЫКЛ", TextColor3=Color3.new(1,1,1), Font=Enum.Font.GothamBold, TextSize=13, BorderSizePixel=0, LayoutOrder=9}, pageMisc); create("UICorner", {CornerRadius=UDim.new(0,6)}, btnToggleExtRefill)
+    local btnToggleExtTP = create("TextButton", {Size=UDim2.new(0,220,0,35), BackgroundColor3=Color3.fromRGB(100,100,100), Text="Кнопка ТП: ВЫКЛ", TextColor3=Color3.new(1,1,1), Font=Enum.Font.GothamBold, TextSize=13, BorderSizePixel=0, LayoutOrder=7}, pageMisc); create("UICorner", {CornerRadius=UDim.new(0,6)}, btnToggleExtTP)
+    local btnToggleExtRefill = create("TextButton", {Size=UDim2.new(0,220,0,35), BackgroundColor3=Color3.fromRGB(100,100,100), Text="Кнопка пополнения: ВЫКЛ", TextColor3=Color3.new(1,1,1), Font=Enum.Font.GothamBold, TextSize=13, BorderSizePixel=0, LayoutOrder=9}, pageMisc); create("UICorner", {CornerRadius=UDim.new(0,6)}, btnToggleExtRefill)
 
-    local lblExtTpInfo = create("TextLabel", {Size=UDim2.new(0,220,0,15), BackgroundTransparency=1, Text="(Только к людям)", TextColor3=Color3.fromRGB(150,150,150), Font=Enum.Font.Gotham, TextSize=11, TextXAlignment=Enum.TextXAlignment.Center, LayoutOrder=10}, pageMisc)
     local lblPList = create("TextLabel", {Size=UDim2.new(0,220,0,20), BackgroundTransparency=1, Text="Игроки (ТП):", TextColor3=Color3.fromRGB(200,200,200), Font=Enum.Font.GothamBold, TextSize=12, TextXAlignment=Enum.TextXAlignment.Left, LayoutOrder=11}, pageMisc)
     local playerListFrame = create("ScrollingFrame", {Size=UDim2.new(0,220,0,150), BackgroundColor3=Color3.fromRGB(30,30,40), BorderSizePixel=0, ScrollBarThickness=2, CanvasSize=UDim2.new(0,0,0,0), AutomaticCanvasSize=Enum.AutomaticSize.Y, LayoutOrder=12}, pageMisc)
     create("UICorner", {CornerRadius=UDim.new(0,6)}, playerListFrame)
@@ -229,8 +220,7 @@ local function main()
     -- AUTO-FARM
     local FarmBtn = create("TextButton", {Size=UDim2.new(0,220,0,40), Position=UDim2.new(0.5,-110,0,40), BackgroundColor3=Color3.fromRGB(100,100,100), Text="АВТО-ФАРМ: ВЫКЛ", TextColor3=Color3.new(1,1,1), Font=Enum.Font.GothamBold, TextSize=13, BorderSizePixel=0}, pageFarm)
     create("UICorner", {CornerRadius=UDim.new(0,6)}, FarmBtn)
-    local FarmWarn = create("TextLabel", {Size=UDim2.new(0,220,0,20), Position=UDim2.new(0.5,-110,0,90), BackgroundTransparency=1, Text="ВНИМАНИЕ: Нужен АК-74!", TextColor3=Color3.fromRGB(255,50,50), Font=Enum.Font.GothamBold, TextSize=12, TextXAlignment=Enum.TextXAlignment.Center}, pageFarm)
-    local FarmStatus = create("TextLabel", {Size=UDim2.new(0,220,0,20), Position=UDim2.new(0.5,-110,0,120), BackgroundTransparency=1, Text="Ожидание...", TextColor3=Color3.fromRGB(200,200,200), Font=Enum.Font.GothamBold, TextSize=11, TextXAlignment=Enum.TextXAlignment.Center}, pageFarm)
+    local FarmWarn = create("TextLabel", {Size=UDim2.new(0,220,0,20), Position=UDim2.new(0.5,-110,0,90), BackgroundTransparency=1, Text="ВНИМАНИЕ: Нужен АК-47!", TextColor3=Color3.fromRGB(255,50,50), Font=Enum.Font.GothamBold, TextSize=12, TextXAlignment=Enum.TextXAlignment.Center}, pageFarm)
 
     -- ВНЕШНИЕ КНОПКИ
     local extBtn = create("TextButton", {Size=UDim2.new(0,60,0,60), Position=UDim2.new(1,-80,0.5,-30), BackgroundColor3=Color3.fromRGB(0,150,80), Text="TP", TextColor3=Color3.new(1,1,1), Font=Enum.Font.GothamBold, TextSize=18, ZIndex=100, Visible=false}, gui)
@@ -276,11 +266,6 @@ local function main()
         
         lblDist.Text = L("dist")..tostring(maxDist).."м"
         btnFov.Text = L("fov")..(fovMode and tostring(fovValue) or L("off")); btnFov.BackgroundColor3 = fovMode and Color3.fromRGB(0,150,80) or Color3.fromRGB(50,50,60)
-        
-        btnThirdPerson.Text = L("tp_cam")..(thirdPersonEnabled and L("on") or L("off")); btnThirdPerson.BackgroundColor3 = thirdPersonEnabled and Color3.fromRGB(0,150,80) or Color3.fromRGB(100,100,100)
-        zoomLabel.Text = L("zoom")..tostring(cameraZoom)
-        zoomLabel.Visible = thirdPersonEnabled
-        zoomSliderBg.Visible = thirdPersonEnabled
 
         btnFly.Text = L("fly")..(flyMode and L("on") or L("off")); btnFly.BackgroundColor3 = flyMode and Color3.fromRGB(0,150,80) or Color3.fromRGB(100,100,100)
         if speedMode then btnSpd.Text = L("spd")..tostring(walkSpeedVal); btnSpd.BackgroundColor3 = Color3.fromRGB(0,150,80) else btnSpd.Text = L("spd")..L("off"); btnSpd.BackgroundColor3 = Color3.fromRGB(100,100,100) end
@@ -313,7 +298,6 @@ local function main()
         btnToggleExtRefill.Text = L("ext_refill")..(extRefillEnabled and L("on") or L("off"))
         btnToggleExtRefill.BackgroundColor3 = extRefillEnabled and Color3.fromRGB(0,150,80) or Color3.fromRGB(100,100,100)
 
-        lblExtTpInfo.Text = L("ext_tp_info")
         lblPList.Text = L("plist")
         
         lblOther.Text = L("other_title")
@@ -356,33 +340,12 @@ local function main()
     setupSlider(aimFovSliderBg, aimFovSliderFill, aimFovSliderKnob, 50, 500, function(v) aimFov = math.floor(v); aimFovLabel.Text = L("sa_fov")..tostring(aimFov); fovCircle.Size = UDim2.new(0, aimFov*2, 0, aimFov*2); fovCircle.Position = UDim2.new(0.5,-aimFov,0.5,-aimFov) end)
     setupSlider(aimPredSliderBg, aimPredSliderFill, aimPredSliderKnob, 0.0, 0.3, function(v) aimPrediction = v; aimPredLabel.Text = L("sa_pr")..string.format("%.2f", v) end)
     setupSlider(flySpeedSliderBg, flySpeedSliderFill, flySpeedSliderKnob, 10, 200, function(v) flySpeed = v; flySpeedLabel.Text = L("fly_spd")..tostring(math.floor(v)) end)
-    setupSlider(zoomSliderBg, zoomSliderFill, zoomSliderKnob, 10, 150, function(v) 
-        cameraZoom = math.floor(v); zoomLabel.Text = L("zoom")..tostring(cameraZoom)
-        if thirdPersonEnabled then
-            LP.CameraMaxZoomDistance = cameraZoom
-            LP.CameraMinZoomDistance = cameraZoom
-        end
-    end)
 
     btnRu.MouseButton1Click:Connect(function() currentLang="ru"; updateUI() end)
     btnEn.MouseButton1Click:Connect(function() currentLang="en"; updateUI() end)
     btnP.MouseButton1Click:Connect(function() pMode=pMode%3+1; updateUI() end)
     btnD.MouseButton1Click:Connect(function() dMode=dMode%3+1; updateUI() end)
     btnFov.MouseButton1Click:Connect(function() fovMode = not fovMode; fovSliderBg.Visible = fovMode; if not fovMode then Cam.FieldOfView = 70 end; updateUI() end)
-
-    btnThirdPerson.MouseButton1Click:Connect(function() 
-        thirdPersonEnabled = not thirdPersonEnabled
-        if thirdPersonEnabled then
-            LP.CameraMode = Enum.CameraMode.Classic
-            LP.CameraMaxZoomDistance = cameraZoom
-            LP.CameraMinZoomDistance = cameraZoom
-        else
-            LP.CameraMode = Enum.CameraMode.LockFirstPerson
-            LP.CameraMaxZoomDistance = 12
-            LP.CameraMinZoomDistance = 0.5
-        end
-        updateUI()
-    end)
 
     btnAim.MouseButton1Click:Connect(function() aimEnabled = not aimEnabled; if not aimEnabled then aimCurrentTarget = nil end; updateUI() end)
     btnAimTarget.MouseButton1Click:Connect(function() aimTargetMode = aimTargetMode%3+1; updateUI() end)
@@ -563,7 +526,7 @@ local function main()
         if name == "" or name == nil then cfgStatus.Text = "Введите имя!"; cfgStatus.TextColor3 = Color3.fromRGB(255,50,50); return end
         local success, err = pcall(function()
             if not isfolder("pidorashub_configs") then makefolder("pidorashub_configs") end
-            local data = maxDist.."|"..walkSpeedVal.."|"..fovValue.."|"..timeValue.."|"..aimFov.."|"..aimPrediction.."|"..pMode.."|"..dMode.."|"..aimTargetMode.."|"..tostring(aimVisibleOnly).."|"..tostring(spinEnabled).."|"..tostring(extTPEnabled).."|"..tostring(flySpeed).."|"..tostring(antiAfkEnabled).."|"..tostring(espColorMode).."|"..tostring(wmEnabled).."|"..tostring(weatherMode).."|"..tostring(killFeedEnabled).."|"..tostring(extRefillEnabled).."|"..tostring(thirdPersonEnabled).."|"..tostring(cameraZoom)
+            local data = maxDist.."|"..walkSpeedVal.."|"..fovValue.."|"..timeValue.."|"..aimFov.."|"..aimPrediction.."|"..pMode.."|"..dMode.."|"..aimTargetMode.."|"..tostring(aimVisibleOnly).."|"..tostring(spinEnabled).."|"..tostring(extTPEnabled).."|"..tostring(flySpeed).."|"..tostring(antiAfkEnabled).."|"..tostring(espColorMode).."|"..tostring(wmEnabled).."|"..tostring(weatherMode).."|"..tostring(killFeedEnabled).."|"..tostring(extRefillEnabled)
             writefile("pidorashub_configs/"..name..".txt", data)
         end)
         if success then cfgStatus.Text = L("cfg_saved"); cfgStatus.TextColor3 = Color3.fromRGB(0,255,0) else cfgStatus.Text = L("cfg_err"); cfgStatus.TextColor3 = Color3.fromRGB(255,50,50) end
@@ -597,11 +560,6 @@ local function main()
             if vals[17] then weatherMode = tonumber(vals[17]) or weatherMode; applyWeather() end
             if vals[18] then killFeedEnabled = vals[18] == "true" end
             if vals[19] then extRefillEnabled = vals[19] == "true"; extRefillBtn.Visible = extRefillEnabled end
-            if vals[20] then 
-                thirdPersonEnabled = vals[20] == "true"
-                if thirdPersonEnabled then LP.CameraMode = Enum.CameraMode.Classic else LP.CameraMode = Enum.CameraMode.LockFirstPerson end
-            end
-            if vals[21] then cameraZoom = tonumber(vals[21]) or cameraZoom; zoomSliderFill.Size = UDim2.new((cameraZoom-10)/(150-10),0,1,0); zoomSliderKnob.Position = UDim2.new((cameraZoom-10)/(150-10),-8,0.5,-8) end
             updateUI()
         end)
         if success then cfgStatus.Text = L("cfg_loaded"); cfgStatus.TextColor3 = Color3.fromRGB(0,255,0) else cfgStatus.Text = L("cfg_err"); cfgStatus.TextColor3 = Color3.fromRGB(255,50,50) end
@@ -800,34 +758,6 @@ local function main()
             else local bv = myChar.HumanoidRootPart:FindFirstChild("FlyBV"); if bv then bv:Destroy() end end
         end
 
-        if thirdPersonEnabled then
-            if LP.CameraMode ~= Enum.CameraMode.Classic then
-                LP.CameraMode = Enum.CameraMode.Classic
-                LP.CameraMaxZoomDistance = cameraZoom
-                LP.CameraMinZoomDistance = cameraZoom
-            end
-            for _, obj in pairs(Cam:GetChildren()) do
-                if obj:IsA("Model") or obj:IsA("BasePart") then
-                    for _, p in pairs(obj:GetDescendants()) do
-                        if p:IsA("BasePart") and p.LocalTransparencyModifier < 1 then
-                            p.LocalTransparencyModifier = 1
-                        end
-                    end
-                end
-            end
-            if myChar then
-                for _, tool in pairs(myChar:GetChildren()) do
-                    if tool:IsA("Tool") then
-                        for _, p in pairs(tool:GetDescendants()) do
-                            if p:IsA("BasePart") then
-                                p.LocalTransparencyModifier = 0
-                            end
-                        end
-                    end
-                end
-            end
-        end
-
         if weatherPart and weatherMode > 0 then weatherPart.Position = Cam.CFrame.Position + Vector3.new(0, 25, 0) end
 
         if not myChar or not myChar:FindFirstChild("HumanoidRootPart") then 
@@ -981,12 +911,9 @@ local function main()
                 if not myChar or not myHum or myHum.Health <= 0 or LP:GetAttribute("InLobby") == true then
                     if not isDeadFarm then
                         isDeadFarm = true
-                        FarmStatus.Text = "Мертв/Лобби. Жду..."
-                        FarmStatus.TextColor3 = Color3.fromRGB(255, 200, 0)
                         lastActionTimeFarm = tick()
                     end
                     if tick() - lastActionTimeFarm > 4 then
-                        FarmStatus.Text = "Нажимаю 'В Бой'..."
                         ClickPlayButton()
                         task.wait(3)
                         shotsFired = 0
@@ -998,8 +925,6 @@ local function main()
                 end
 
                 if not myChar:FindFirstChildOfClass("Tool") then
-                    FarmStatus.Text = "Беру оружие в руки..."
-                    FarmStatus.TextColor3 = Color3.fromRGB(255, 150, 0)
                     if not EquipWeapon() then task.wait(1) end
                     continue
                 end
@@ -1009,15 +934,11 @@ local function main()
                 if shotsFired >= 30 then
                     magsUsed = magsUsed + 1
                     if magsUsed >= 7 then
-                        FarmStatus.Text = "Патроны кончились. Самовыпил..."
-                        FarmStatus.TextColor3 = Color3.fromRGB(255, 0, 0)
                         myHum.Health = 0
                         continue
                     else
                         isReloadingFarm = true
                         task.spawn(function()
-                            FarmStatus.Text = "Перезарядка..."
-                            FarmStatus.TextColor3 = Color3.fromRGB(0, 150, 255)
                             AttemptReload()
                             task.wait(2)
                             shotsFired = 0
@@ -1029,9 +950,6 @@ local function main()
 
                 local target = getClosestFarmTarget()
                 if target and target:FindFirstChild("Head") and target:FindFirstChild("HumanoidRootPart") then
-                    FarmStatus.Text = "Убиваю... (Маг: " .. (magsUsed + 1) .. "/7 | Патр: " .. (30 - shotsFired) .. ")"
-                    FarmStatus.TextColor3 = Color3.fromRGB(0, 255, 0)
-                    
                     myChar.HumanoidRootPart.CFrame = target.HumanoidRootPart.CFrame * CFrame.new(0, 1, 2)
                     Cam.CFrame = CFrame.lookAt(Cam.CFrame.Position, target.Head.Position)
                     
@@ -1043,9 +961,6 @@ local function main()
                         end)
                         shotsFired = shotsFired + 1
                     end
-                else
-                    FarmStatus.Text = "Ищу цели..."
-                    FarmStatus.TextColor3 = Color3.fromRGB(200, 200, 200)
                 end
             end
         end
