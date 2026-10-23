@@ -2,6 +2,8 @@ local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
 local Lighting = game:GetService("Lighting")
 local TweenService = game:GetService("TweenService")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local VirtualUser = game:GetService("VirtualUser")
 local LP = Players.LocalPlayer
 local Cam = workspace.CurrentCamera
 local UIS = game:GetService("UserInputService")
@@ -37,12 +39,15 @@ local extTPDroneEnabled, extRefillEnabled = false, false
 local thirdPersonEnabled = false
 local cameraZoom = 50
 
--- ВЕРСИЯ СКРИПТА
-local SCRIPT_VERSION = "v2.6 (Clean TP)"
+-- Auto Farm
+local autoFarmEnabled = false
+local AK74ShootRemote = ReplicatedStorage:FindFirstChild("AK74ShootRemote_R1")
+local shotsFired, magsUsed = 0, 0
+local isReloadingFarm, isDeadFarm, lastActionTimeFarm = false, false, 0
 
 local lang = {
-    ru = {v="Визуал", m="Движение", f="Бой", mel="Меллстрой", misc="Разное", l="Язык", s="Настройки", inf="Инфо", p="Люди: ", d="Дроны: ", dist="Дистанция: ", opt="Оптимизация: ", time="Время: ", fly="Полет: ", spd="Скорость: ", fly_spd="Скор. полета: ", jmp="Прыжок: ", spin="Спин: ", warn="Включите ESP Дронов!", del="УДАЛИТЬ СКРИПТ", on="ВКЛ", off="ВЫКЛ", move_title="Движение", world_title="Мир / World", cam_title="Камера", fov="FOV: ", tp_cam="Третье лицо: ", zoom="Зум: ", fight_title="Бой / Fight", esp_title="ESP", sa="Aimlock: ", sa_t="Цель: ", sa_fov="FOV Aim: ", sa_pr="Предикт: ", sa_vis="Только видимые: ", t_people="Люди", t_drones="Дроны", t_both="Оба", cfg_name="Имя конфига:", cfg_save="СОХРАНИТЬ", cfg_load="ЗАГРУЗИТЬ", cfg_saved="Сохранено!", cfg_loaded="Загружено!", cfg_err="Ошибка!", tp_title="Телепорт", tp_plr="ТП к ближ. игроку", tp_drn="ТП к ближ. дрону", tp_drn_enemy="ТП Дрона", auto_tp="Авто-ТП дрона: ", ext_tp="Внешняя ТП: ", ext_drn="Внешняя ТП Дрона: ", ext_refill="Внешняя пополнение: ", ext_tp_info="(Только к людям)", other_title="Прочее", anti_afk="Anti-AFK: ", color="Цвет: ", wm="Водяной знак (FPS): ", weather="Погода: ", w_off="ВЫКЛ", w_snow="СНЕГ", w_rain="ДОЖДЬ", plist="Игроки (ТП):", refill="Пополнить дроны (ТП)", kf="Лог смертей: ", info_title="Мой Телеграм:", copy_msg="Ссылка скопирована!"},
-    en = {v="Visuals", m="Movement", f="Fight", mel="Mellstroy", misc="Misc", l="Language", s="Settings", inf="Info", p="People: ", d="Drones: ", dist="Distance: ", opt="Optimization: ", time="Time: ", fly="Fly: ", spd="Speed: ", fly_spd="Fly Speed: ", jmp="Jump: ", spin="Spin: ", warn="Enable Drone ESP!", del="DELETE SCRIPT", on="ON", off="OFF", move_title="Movement", world_title="World", cam_title="Camera", fov="FOV: ", tp_cam="Third Person: ", zoom="Zoom: ", fight_title="Fight", esp_title="ESP", sa="Aimlock: ", sa_t="Target: ", sa_fov="FOV Aim: ", sa_pr="Predict: ", sa_vis="Only Visible: ", t_people="People", t_drones="Drones", t_both="Both", cfg_name="Config Name:", cfg_save="SAVE", cfg_load="LOAD", cfg_saved="Saved!", cfg_loaded="Loaded!", cfg_err="Error!", tp_title="Teleport", tp_plr="TP to nearest player", tp_drn="TP to nearest drone", tp_drn_enemy="TP Drone", auto_tp="Auto-TP drone: ", ext_tp="External TP: ", ext_drn="Ext TP Drone: ", ext_refill="Ext Refill: ", ext_tp_info="(People only)", other_title="Other", anti_afk="Anti-AFK: ", color="Color: ", wm="Watermark (FPS): ", weather="Weather: ", w_off="OFF", w_snow="SNOW", w_rain="RAIN", plist="Players (TP):", refill="Refill drones (TP)", kf="Kill Feed: ", info_title="My Telegram:", copy_msg="Link copied!"}
+    ru = {v="Визуал", m="Движение", f="Бой", mel="Меллстрой", misc="Разное", farm="Авто-Фарм", l="Язык", s="Настройки", inf="Инфо", p="Люди: ", d="Дроны: ", dist="Дистанция: ", opt="Оптимизация: ", time="Время: ", fly="Полет: ", spd="Скорость: ", fly_spd="Скор. полета: ", jmp="Прыжок: ", spin="Спин: ", warn="Включите ESP Дронов!", del="УДАЛИТЬ СКРИПТ", on="ВКЛ", off="ВЫКЛ", move_title="Движение", world_title="Мир / World", cam_title="Камера", fov="FOV: ", tp_cam="Третье лицо: ", zoom="Зум: ", fight_title="Бой / Fight", esp_title="ESP", sa="Aimlock: ", sa_t="Цель: ", sa_fov="FOV Aim: ", sa_pr="Предикт: ", sa_vis="Только видимые: ", t_people="Люди", t_drones="Дроны", t_both="Оба", cfg_name="Имя конфига:", cfg_save="СОХРАНИТЬ", cfg_load="ЗАГРУЗИТЬ", cfg_saved="Сохранено!", cfg_loaded="Загружено!", cfg_err="Ошибка!", tp_title="Телепорт", tp_plr="ТП к ближ. игроку", tp_drn="ТП к ближ. дрону", tp_drn_enemy="ТП Дрона", auto_tp="Авто-ТП дрона: ", ext_tp="Внешняя ТП: ", ext_drn="Внешняя ТП Дрона: ", ext_refill="Внешняя пополнение: ", ext_tp_info="(Только к людям)", other_title="Прочее", anti_afk="Anti-AFK: ", color="Цвет: ", wm="Водяной знак (FPS): ", weather="Погода: ", w_off="ВЫКЛ", w_snow="СНЕГ", w_rain="ДОЖДЬ", plist="Игроки (ТП):", refill="Пополнить дроны (ТП)", kf="Лог смертей: ", info_title="Мой Телеграм:", copy_msg="Ссылка скопирована!", farm_warn="ВНИМАНИЕ: Нужен АК-74 в рюкзаке!", farm_btn="АВТО-ФАРМ: "},
+    en = {v="Visuals", m="Movement", f="Fight", mel="Mellstroy", misc="Misc", farm="Auto-Farm", l="Language", s="Settings", inf="Info", p="People: ", d="Drones: ", dist="Distance: ", opt="Optimization: ", time="Time: ", fly="Fly: ", spd="Speed: ", fly_spd="Fly Speed: ", jmp="Jump: ", spin="Spin: ", warn="Enable Drone ESP!", del="DELETE SCRIPT", on="ON", off="OFF", move_title="Movement", world_title="World", cam_title="Camera", fov="FOV: ", tp_cam="Third Person: ", zoom="Zoom: ", fight_title="Fight", esp_title="ESP", sa="Aimlock: ", sa_t="Target: ", sa_fov="FOV Aim: ", sa_pr="Predict: ", sa_vis="Only Visible: ", t_people="People", t_drones="Drones", t_both="Both", cfg_name="Config Name:", cfg_save="SAVE", cfg_load="LOAD", cfg_saved="Saved!", cfg_loaded="Loaded!", cfg_err="Error!", tp_title="Teleport", tp_plr="TP to nearest player", tp_drn="TP to nearest drone", tp_drn_enemy="TP Drone", auto_tp="Auto-TP drone: ", ext_tp="External TP: ", ext_drn="Ext TP Drone: ", ext_refill="Ext Refill: ", ext_tp_info="(People only)", other_title="Other", anti_afk="Anti-AFK: ", color="Color: ", wm="Watermark (FPS): ", weather="Weather: ", w_off="OFF", w_snow="SNOW", w_rain="RAIN", plist="Players (TP):", refill="Refill drones (TP)", kf="Kill Feed: ", info_title="My Telegram:", copy_msg="Link copied!", farm_warn="WARNING: Need AK-74 in backpack!", farm_btn="AUTO-FARM: "}
 }
 local function L(k) return lang[currentLang][k] end
 
@@ -56,10 +61,10 @@ end
 local loadGui = create("ScreenGui", {Name="LoadGui", ResetOnSpawn=false, IgnoreGuiInset=true}, CoreGui)
 local loadFrame = create("Frame", {Size=UDim2.new(1,0,1,0), BackgroundColor3=Color3.fromRGB(15,15,20), BorderSizePixel=0, ZIndex=100}, loadGui)
 create("TextLabel", {Size=UDim2.new(1,0,0,60), Position=UDim2.new(0,0,0.5,-30), BackgroundTransparency=1, Text="pidorashub", TextColor3=Color3.fromRGB(255,255,255), Font=Enum.Font.GothamBold, TextSize=48, ZIndex=101}, loadFrame)
-create("TextLabel", {Size=UDim2.new(1,0,0,20), Position=UDim2.new(0,0,0.5,30), BackgroundTransparency=1, Text="Версия: "..SCRIPT_VERSION, TextColor3=Color3.fromRGB(150,150,150), Font=Enum.Font.Gotham, TextSize=16, ZIndex=101}, loadFrame)
+create("TextLabel", {Size=UDim2.new(1,0,0,20), Position=UDim2.new(0,0,0.5,30), BackgroundTransparency=1, Text="Загрузка модулей...", TextColor3=Color3.fromRGB(150,150,150), Font=Enum.Font.Gotham, TextSize=16, ZIndex=101}, loadFrame)
 
 local gui = create("ScreenGui", {Name="ESP_GUI", ResetOnSpawn=false, Enabled=false, IgnoreGuiInset=true}, CoreGui)
-local watermark = create("TextLabel", {Size=UDim2.new(0,250,0,20), Position=UDim2.new(0.5,-125,0,10), BackgroundTransparency=1, Text="pidorashub "..SCRIPT_VERSION.." | FPS: 60", TextColor3=Color3.fromRGB(255,255,255), Font=Enum.Font.GothamBold, TextSize=14, TextXAlignment=Enum.TextXAlignment.Center, ZIndex=100, Visible=false}, gui)
+local watermark = create("TextLabel", {Size=UDim2.new(0,200,0,20), Position=UDim2.new(0.5,-100,0,10), BackgroundTransparency=1, Text="pidorashub | FPS: 60", TextColor3=Color3.fromRGB(255,255,255), Font=Enum.Font.GothamBold, TextSize=14, TextXAlignment=Enum.TextXAlignment.Center, ZIndex=100, Visible=false}, gui)
 local killFeedFrame = create("Frame", {Size=UDim2.new(0,300,0,200), Position=UDim2.new(1,-20,0,60), AnchorPoint=Vector2.new(1,0), BackgroundTransparency=1, ZIndex=90}, gui)
 create("UIListLayout", {Padding=UDim.new(0,5), SortOrder=Enum.SortOrder.LayoutOrder, HorizontalAlignment=Enum.HorizontalAlignment.Right, VerticalAlignment=Enum.VerticalAlignment.Top}, killFeedFrame)
 
@@ -76,7 +81,7 @@ create("UIStroke", {Color=Color3.fromRGB(60,60,70), Thickness=1.5}, main)
 local topBar = create("Frame", {Size=UDim2.new(1,0,0,35), BackgroundColor3=Color3.fromRGB(30,30,40), BorderSizePixel=0}, main)
 create("UICorner", {CornerRadius=UDim.new(0,10)}, topBar)
 create("Frame", {Size=UDim2.new(1,0,0,15), Position=UDim2.new(0,0,1,-15), BackgroundColor3=Color3.fromRGB(30,30,40), BorderSizePixel=0}, topBar)
-create("TextLabel", {Size=UDim2.new(1,-40,1,0), Position=UDim2.new(0,15,0,0), BackgroundTransparency=1, Text="Pidhub "..SCRIPT_VERSION, TextColor3=Color3.fromRGB(255,255,255), Font=Enum.Font.GothamBold, TextSize=14, TextXAlignment=Enum.TextXAlignment.Left}, topBar)
+create("TextLabel", {Size=UDim2.new(1,-40,1,0), Position=UDim2.new(0,15,0,0), BackgroundTransparency=1, Text="Pidoras hub", TextColor3=Color3.fromRGB(255,255,255), Font=Enum.Font.GothamBold, TextSize=14, TextXAlignment=Enum.TextXAlignment.Left}, topBar)
 local closeBtn = create("TextButton", {Size=UDim2.new(0,25,0,25), Position=UDim2.new(1,-30,0,5), BackgroundTransparency=1, Text="-", TextColor3=Color3.fromRGB(255,100,100), Font=Enum.Font.GothamBold, TextSize=20}, topBar)
 
 local menuBtn = create("TextButton", {Size=UDim2.new(0,65,0,65), Position=UDim2.new(0,20,0.5,-32), BackgroundTransparency=1, Text="", BorderSizePixel=0, Visible=false, ZIndex=100, ClipsDescendants=true}, gui)
@@ -100,9 +105,10 @@ local tabMove = createTab("Movement", 2); create("UICorner", {CornerRadius=UDim.
 local tabFight = createTab("Fight", 3); create("UICorner", {CornerRadius=UDim.new(0,6)}, tabFight)
 local tabMell = createTab("Mellstroy", 4); create("UICorner", {CornerRadius=UDim.new(0,6)}, tabMell)
 local tabMisc = createTab("Misc", 5); create("UICorner", {CornerRadius=UDim.new(0,6)}, tabMisc)
-local tabLang = createTab("Language", 6); create("UICorner", {CornerRadius=UDim.new(0,6)}, tabLang)
-local tabSet = createTab("Settings", 7); create("UICorner", {CornerRadius=UDim.new(0,6)}, tabSet)
-local tabInfo = createTab("Info", 8); create("UICorner", {CornerRadius=UDim.new(0,6)}, tabInfo)
+local tabFarm = createTab("Auto-Farm", 6); create("UICorner", {CornerRadius=UDim.new(0,6)}, tabFarm)
+local tabLang = createTab("Language", 7); create("UICorner", {CornerRadius=UDim.new(0,6)}, tabLang)
+local tabSet = createTab("Settings", 8); create("UICorner", {CornerRadius=UDim.new(0,6)}, tabSet)
+local tabInfo = createTab("Info", 9); create("UICorner", {CornerRadius=UDim.new(0,6)}, tabInfo)
 
 local pageVis = create("ScrollingFrame", {Size=UDim2.new(1,0,1,0), BackgroundTransparency=1, BorderSizePixel=0, ScrollBarThickness=2, CanvasSize=UDim2.new(0,0,0,0), AutomaticCanvasSize=Enum.AutomaticSize.Y, Visible=true}, contentArea)
 create("UIListLayout", {Padding=UDim.new(0,10), SortOrder=Enum.SortOrder.LayoutOrder, HorizontalAlignment=Enum.HorizontalAlignment.Center, VerticalAlignment=Enum.VerticalAlignment.Top}, pageVis)
@@ -113,15 +119,15 @@ create("UIListLayout", {Padding=UDim.new(0,10), SortOrder=Enum.SortOrder.LayoutO
 local pageMell = create("Frame", {Size=UDim2.new(1,0,1,0), BackgroundTransparency=1, Visible=false}, contentArea)
 local pageMisc = create("ScrollingFrame", {Size=UDim2.new(1,0,1,0), BackgroundTransparency=1, BorderSizePixel=0, ScrollBarThickness=2, CanvasSize=UDim2.new(0,0,0,0), AutomaticCanvasSize=Enum.AutomaticSize.Y, Visible=false}, contentArea)
 create("UIListLayout", {Padding=UDim.new(0,10), SortOrder=Enum.SortOrder.LayoutOrder, HorizontalAlignment=Enum.HorizontalAlignment.Center, VerticalAlignment=Enum.VerticalAlignment.Top}, pageMisc)
+local pageFarm = create("Frame", {Size=UDim2.new(1,0,1,0), BackgroundTransparency=1, Visible=false}, contentArea)
 local pageLang = create("Frame", {Size=UDim2.new(1,0,1,0), BackgroundTransparency=1, Visible=false}, contentArea)
 local pageSet = create("ScrollingFrame", {Size=UDim2.new(1,0,1,0), BackgroundTransparency=1, BorderSizePixel=0, ScrollBarThickness=2, CanvasSize=UDim2.new(0,0,0,0), AutomaticCanvasSize=Enum.AutomaticSize.Y, Visible=false}, contentArea)
 create("UIListLayout", {Padding=UDim.new(0,10), SortOrder=Enum.SortOrder.LayoutOrder, HorizontalAlignment=Enum.HorizontalAlignment.Center, VerticalAlignment=Enum.VerticalAlignment.Top}, pageSet)
-
 local pageInfo = create("Frame", {Size=UDim2.new(1,0,1,0), BackgroundTransparency=1, Visible=false}, contentArea)
 
 local function switchTab(btn, page)
-    for _, b in pairs({tabVis, tabMove, tabFight, tabMell, tabMisc, tabLang, tabSet, tabInfo}) do b.BackgroundColor3 = Color3.fromRGB(40,40,50); b.TextColor3 = Color3.fromRGB(200,200,200) end
-    for _, p in pairs({pageVis, pageMove, pageFight, pageMell, pageMisc, pageLang, pageSet, pageInfo}) do p.Visible = false end
+    for _, b in pairs({tabVis, tabMove, tabFight, tabMell, tabMisc, tabFarm, tabLang, tabSet, tabInfo}) do b.BackgroundColor3 = Color3.fromRGB(40,40,50); b.TextColor3 = Color3.fromRGB(200,200,200) end
+    for _, p in pairs({pageVis, pageMove, pageFight, pageMell, pageMisc, pageFarm, pageLang, pageSet, pageInfo}) do p.Visible = false end
     btn.BackgroundColor3 = Color3.fromRGB(0,150,255); btn.TextColor3 = Color3.new(1,1,1); page.Visible = true
 end
 
@@ -130,6 +136,7 @@ tabMove.MouseButton1Click:Connect(function() switchTab(tabMove, pageMove) end)
 tabFight.MouseButton1Click:Connect(function() switchTab(tabFight, pageFight) end)
 tabMell.MouseButton1Click:Connect(function() switchTab(tabMell, pageMell) end)
 tabMisc.MouseButton1Click:Connect(function() switchTab(tabMisc, pageMisc) end)
+tabFarm.MouseButton1Click:Connect(function() switchTab(tabFarm, pageFarm) end)
 tabLang.MouseButton1Click:Connect(function() switchTab(tabLang, pageLang) end)
 tabSet.MouseButton1Click:Connect(function() switchTab(tabSet, pageSet) end)
 tabInfo.MouseButton1Click:Connect(function() switchTab(tabInfo, pageInfo) end)
@@ -221,6 +228,12 @@ create("UICorner", {CornerRadius=UDim.new(0,6)}, playerListFrame)
 create("UIListLayout", {Padding=UDim.new(0,2), SortOrder=Enum.SortOrder.LayoutOrder}, playerListFrame)
 create("UIPadding", {PaddingTop=UDim.new(0,5), PaddingBottom=UDim.new(0,5), PaddingLeft=UDim.new(0,5), PaddingRight=UDim.new(0,5)}, playerListFrame)
 
+-- AUTO-FARM
+local FarmBtn = create("TextButton", {Size=UDim2.new(0,220,0,40), Position=UDim2.new(0.5,-110,0,40), BackgroundColor3=Color3.fromRGB(100,100,100), Text="АВТО-ФАРМ: ВЫКЛ", TextColor3=Color3.new(1,1,1), Font=Enum.Font.GothamBold, TextSize=13, BorderSizePixel=0}, pageFarm)
+create("UICorner", {CornerRadius=UDim.new(0,6)}, FarmBtn)
+local FarmWarn = create("TextLabel", {Size=UDim2.new(0,220,0,20), Position=UDim2.new(0.5,-110,0,90), BackgroundTransparency=1, Text="ВНИМАНИЕ: Нужен АК-74!", TextColor3=Color3.fromRGB(255,50,50), Font=Enum.Font.GothamBold, TextSize=12, TextXAlignment=Enum.TextXAlignment.Center}, pageFarm)
+local FarmStatus = create("TextLabel", {Size=UDim2.new(0,220,0,20), Position=UDim2.new(0.5,-110,0,120), BackgroundTransparency=1, Text="Ожидание...", TextColor3=Color3.fromRGB(200,200,200), Font=Enum.Font.GothamBold, TextSize=11, TextXAlignment=Enum.TextXAlignment.Center}, pageFarm)
+
 -- ВНЕШНИЕ КНОПКИ
 local extBtn = create("TextButton", {Size=UDim2.new(0,60,0,60), Position=UDim2.new(1,-80,0.5,-30), BackgroundColor3=Color3.fromRGB(0,150,80), Text="TP", TextColor3=Color3.new(1,1,1), Font=Enum.Font.GothamBold, TextSize=18, ZIndex=100, Visible=false}, gui)
 create("UICorner", {CornerRadius=UDim.new(1,0)}, extBtn)
@@ -260,7 +273,7 @@ create("UICorner", {CornerRadius=UDim.new(0,6)}, tgBtn)
 local copyStatus = create("TextLabel", {Size=UDim2.new(1,0,0,20), Position=UDim2.new(0,0,0,125), BackgroundTransparency=1, Text="Ссылка скопирована!", TextColor3=Color3.fromRGB(0,255,0), Font=Enum.Font.GothamBold, TextSize=12, Visible=false}, pageInfo)
 
 function updateUI()
-    tabVis.Text = L("v"); tabMove.Text = L("m"); tabFight.Text = L("f"); tabMell.Text = L("mel"); tabMisc.Text = L("misc"); tabLang.Text = L("l"); tabSet.Text = L("s"); tabInfo.Text = L("inf")
+    tabVis.Text = L("v"); tabMove.Text = L("m"); tabFight.Text = L("f"); tabMell.Text = L("mel"); tabMisc.Text = L("misc"); tabFarm.Text = L("farm"); tabLang.Text = L("l"); tabSet.Text = L("s"); tabInfo.Text = L("inf")
     lblMove.Text = L("move_title"); lblWorld.Text = L("world_title"); lblCam.Text = L("cam_title"); lblFight.Text = L("fight_title"); lblEsp.Text = L("esp_title")
     btnP.Text = L("p")..(pMode==1 and "3D" or pMode==2 and "2D" or L("off")); btnP.BackgroundColor3 = pMode==1 and Color3.fromRGB(0,150,80) or pMode==2 and Color3.fromRGB(0,150,255) or Color3.fromRGB(100,100,100)
     btnD.Text = L("d")..(dMode==1 and "3D" or dMode==2 and "2D" or L("off")); btnD.BackgroundColor3 = dMode==1 and Color3.fromRGB(255,200,0) or dMode==2 and Color3.fromRGB(255,150,0) or Color3.fromRGB(100,100,100)
@@ -329,6 +342,10 @@ function updateUI()
     
     cfgLabel.Text = L("cfg_name"); btnSaveConfig.Text = L("cfg_save"); btnLoadConfig.Text = L("cfg_load")
     tgTitle.Text = L("info_title"); copyStatus.Text = L("copy_msg")
+
+    FarmWarn.Text = L("farm_warn")
+    FarmBtn.Text = L("farm_btn")..(autoFarmEnabled and L("on") or L("off"))
+    FarmBtn.BackgroundColor3 = autoFarmEnabled and Color3.fromRGB(0,150,80) or Color3.fromRGB(100,100,100)
 end
 
 local function setupSlider(sliderBg, fill, knob, min, max, callback)
@@ -396,6 +413,14 @@ btnEspColor.MouseButton1Click:Connect(function()
     for p, d in pairs(esp) do if d.HL then d.HL.OutlineColor = newColor end; if d.Box2D then d.Box2D.UIStroke.Color = newColor end end
     for m, d in pairs(drones) do if d.HL then d.HL.OutlineColor = newColor end; if d.Box2D then d.Box2D.UIStroke.Color = newColor end end
     updateUI() 
+end)
+
+FarmBtn.MouseButton1Click:Connect(function()
+    autoFarmEnabled = not autoFarmEnabled
+    if autoFarmEnabled then
+        shotsFired = 0; magsUsed = 0; isDeadFarm = false; isReloadingFarm = false
+    end
+    updateUI()
 end)
 
 tgBtn.MouseButton1Click:Connect(function()
@@ -488,7 +513,6 @@ btnTpDrn.MouseButton1Click:Connect(function()
     if bestPos then myChar.HumanoidRootPart.CFrame = CFrame.new(bestPos + Vector3.new(0, 3, 0)) end
 end)
 
--- ЧИСТЫЙ ТЕЛЕПОРТ ДРОНА (БЕЗ ВСЯКОЙ ХУЙНИ)
 local function tpDroneToEnemy(specificDrone)
     local myChar = LP.Character
     if not myChar or not myChar:FindFirstChild("HumanoidRootPart") then return end
@@ -716,7 +740,7 @@ end)
 
 local frames = 0; local lastTime = os.clock()
 table.insert(conns, RunService.RenderStepped:Connect(function()
-    if wmEnabled then frames = frames + 1; if os.clock() - lastTime >= 1 then local fps = frames; frames = 0; lastTime = os.clock(); watermark.Text = "pidorashub "..SCRIPT_VERSION.." | FPS: "..fps end end
+    if wmEnabled then frames = frames + 1; if os.clock() - lastTime >= 1 then local fps = frames; frames = 0; lastTime = os.clock(); watermark.Text = "pidorashub | FPS: "..fps end end
 end))
 
 local dragging, dragStart, startPos
@@ -943,6 +967,166 @@ table.insert(conns, RunService.RenderStepped:Connect(function()
         hrp.CFrame = hrp.CFrame * CFrame.Angles(0, math.rad(15), 0); Cam.CFrame = oldCam
     end
 end))
+
+-- ==========================================
+-- AUTO FARM CYCLE
+-- ==========================================
+local function ClickPlayButton()
+    local playBtn = LP.PlayerGui:FindFirstChild("BattleButton", true) or LP.PlayerGui:FindFirstChild("PlayButton", true)
+    if playBtn and playBtn.Visible then
+        pcall(function()
+            if firesignal and playBtn.Activated then firesignal(playBtn.Activated) end
+        end)
+        task.spawn(function()
+            pcall(function()
+                local pos = playBtn.AbsolutePosition + (playBtn.AbsoluteSize / 2)
+                VirtualUser:Button1Down(pos)
+                task.wait(0.05)
+                VirtualUser:Button1Up(pos)
+            end)
+        end)
+    else
+        pcall(function()
+            VirtualUser:Button1Down(Vector2.new(388, 442))
+            task.wait(0.05)
+            VirtualUser:Button1Up(Vector2.new(388, 442))
+        end)
+    end
+end
+
+local function AttemptReload()
+    local reloadBtn = LP.PlayerGui:FindFirstChild("ReloadButton", true)
+    if reloadBtn then
+        pcall(function()
+            if firesignal and reloadBtn.Activated then firesignal(reloadBtn.Activated) end
+        end)
+    end
+end
+
+local function EquipWeapon()
+    local char = LP.Character
+    if not char then return false end
+    local hum = char:FindFirstChildOfClass("Humanoid")
+    if not hum then return false end
+    if char:FindFirstChildOfClass("Tool") then return true end
+    local backpack = LP:FindFirstChild("Backpack")
+    if backpack then
+        local ak74 = backpack:FindFirstChild("AK-74") or backpack:FindFirstChild("AK74")
+        if ak74 then
+            hum:EquipTool(ak74)
+            task.wait(0.5)
+            return true
+        end
+    end
+    return false
+end
+
+local function getClosestFarmTarget()
+    local closest, dist = nil, math.huge
+    local myChar = LP.Character
+    if not myChar or not myChar:FindFirstChild("HumanoidRootPart") then return nil end
+    local myPos = myChar.HumanoidRootPart.Position
+    
+    for _, p in ipairs(Players:GetPlayers()) do
+        if p ~= LP and p.Character and p.Character:FindFirstChild("Head") then
+            local hum = p.Character:FindFirstChildOfClass("Humanoid")
+            if hum and hum.Health > 0 then
+                local d = (p.Character.Head.Position - myPos).Magnitude
+                if d < dist then dist = d; closest = p.Character end
+            end
+        end
+    end
+    for _, obj in ipairs(workspace:GetChildren()) do
+        if obj:IsA("Model") and obj ~= myChar and not Players:GetPlayerFromCharacter(obj) then
+            local hum = obj:FindFirstChildOfClass("Humanoid")
+            local head = obj:FindFirstChild("Head")
+            if hum and hum.Health > 0 and head then
+                local d = (head.Position - myPos).Magnitude
+                if d < dist then dist = d; closest = obj end
+            end
+        end
+    end
+    return closest
+end
+
+task.spawn(function()
+    while task.wait(0.15) do
+        if autoFarmEnabled then
+            local myChar = LP.Character
+            local myHum = myChar and myChar:FindFirstChildOfClass("Humanoid")
+            
+            if not myChar or not myHum or myHum.Health <= 0 or LP:GetAttribute("InLobby") == true then
+                if not isDeadFarm then
+                    isDeadFarm = true
+                    FarmStatus.Text = "Мертв/Лобби. Жду..."
+                    FarmStatus.TextColor3 = Color3.fromRGB(255, 200, 0)
+                    lastActionTimeFarm = tick()
+                end
+                if tick() - lastActionTimeFarm > 4 then
+                    FarmStatus.Text = "Нажимаю 'В Бой'..."
+                    ClickPlayButton()
+                    task.wait(3)
+                    shotsFired = 0
+                    magsUsed = 0
+                    isDeadFarm = false
+                    lastActionTimeFarm = tick()
+                end
+                continue
+            end
+
+            if not myChar:FindFirstChildOfClass("Tool") then
+                FarmStatus.Text = "Беру оружие в руки..."
+                FarmStatus.TextColor3 = Color3.fromRGB(255, 150, 0)
+                if not EquipWeapon() then task.wait(1) end
+                continue
+            end
+
+            if isReloadingFarm then continue end
+
+            if shotsFired >= 30 then
+                magsUsed = magsUsed + 1
+                if magsUsed >= 7 then
+                    FarmStatus.Text = "Патроны кончились. Самовыпил..."
+                    FarmStatus.TextColor3 = Color3.fromRGB(255, 0, 0)
+                    myHum.Health = 0
+                    continue
+                else
+                    isReloadingFarm = true
+                    task.spawn(function()
+                        FarmStatus.Text = "Перезарядка..."
+                        FarmStatus.TextColor3 = Color3.fromRGB(0, 150, 255)
+                        AttemptReload()
+                        task.wait(2)
+                        shotsFired = 0
+                        isReloadingFarm = false
+                    end)
+                    continue
+                end
+            end
+
+            local target = getClosestFarmTarget()
+            if target and target:FindFirstChild("Head") and target:FindFirstChild("HumanoidRootPart") then
+                FarmStatus.Text = "Убиваю... (Маг: " .. (magsUsed + 1) .. "/7 | Патр: " .. (30 - shotsFired) .. ")"
+                FarmStatus.TextColor3 = Color3.fromRGB(0, 255, 0)
+                
+                myChar.HumanoidRootPart.CFrame = target.HumanoidRootPart.CFrame * CFrame.new(0, 1, 2)
+                Cam.CFrame = CFrame.lookAt(Cam.CFrame.Position, target.Head.Position)
+                
+                if AK74ShootRemote then
+                    local origin = Cam.CFrame.Position
+                    local direction = (target.Head.Position - origin).Unit
+                    pcall(function()
+                        AK74ShootRemote:FireServer("Fire", {origin = origin, direction = direction})
+                    end)
+                    shotsFired = shotsFired + 1
+                end
+            else
+                FarmStatus.Text = "Ищу цели..."
+                FarmStatus.TextColor3 = Color3.fromRGB(200, 200, 200)
+            end
+        end
+    end
+end)
 
 btnKill.MouseButton1Click:Connect(function()
     if weatherPart then weatherPart:Destroy() end
