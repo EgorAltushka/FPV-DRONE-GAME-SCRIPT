@@ -485,7 +485,7 @@ btnTpDrn.MouseButton1Click:Connect(function()
     if bestPos then myChar.HumanoidRootPart.CFrame = CFrame.new(bestPos + Vector3.new(0, 3, 0)) end
 end)
 
--- НОВАЯ ФУНКЦИЯ ТП ДРОНА (ФИЗИЧЕСКИЙ ИМПУЛЬС)
+-- ФИКС: СЕТЕВОЙ ОВНЕР + ТЕЛЕПОРТ БЕЗ ФИЗИЧЕСКОГО БРЕДА
 local function tpDroneToEnemy(specificDrone)
     local myChar = LP.Character
     if not myChar or not myChar:FindFirstChild("HumanoidRootPart") then return end
@@ -528,41 +528,33 @@ local function tpDroneToEnemy(specificDrone)
     end
     
     if myDrone then
-        -- Заанкорим дрон, чтобы сервер не сбросил его обратно
-        for _, part in pairs(myDrone:GetDescendants()) do
-            if part:IsA("BasePart") then
-                part.Anchored = true
-            end
-        end
-        
-        -- Телепортируем прямо над головой врага (3 стада вверх)
-        local spawnPos = closestEnemy.Position + Vector3.new(0, 3, 0)
-        myDrone:PivotTo(CFrame.new(spawnPos))
-        
-        -- Ждем 0.1 сек, чтобы сервер зафиксировал новую позицию
-        task.wait(0.1)
-        
-        -- Разъянкорим и даем огромную скорость вниз
-        for _, part in pairs(myDrone:GetDescendants()) do
-            if part:IsA("BasePart") then
-                part.Anchored = false
-                part.AssemblyLinearVelocity = Vector3.new(0, -500, 0)
-            end
-        end
-        
-        -- Дополнительно эмулируем касание (на всякий случай)
-        task.spawn(function()
+        local primary = myDrone.PrimaryPart or myDrone:FindFirstChildWhichIsA("BasePart")
+        if primary then
+            pcall(function()
+                -- Забираем сетевые права у сервера
+                primary:SetNetworkOwner(LP) 
+            end)
+
+            -- Телепортируем дрон прямо над целью
+            local spawnPos = closestEnemy.Position + Vector3.new(0, 2, 0)
+            myDrone:PivotTo(CFrame.new(spawnPos))
+            
+            -- Ждем долю секунды, чтобы физика обновилась
             task.wait(0.05)
-            for _, part in pairs(myDrone:GetDescendants()) do
-                if part:IsA("BasePart") then
-                    pcall(function()
-                        firetouchinterest(part, closestEnemy, 0)
-                        task.wait(0.05)
-                        firetouchinterest(part, closestEnemy, 1)
-                    end)
+
+            -- Эмулируем касание для 100% срабатывания взрыва
+            task.spawn(function()
+                for _, part in pairs(myDrone:GetDescendants()) do
+                    if part:IsA("BasePart") then
+                        pcall(function()
+                            firetouchinterest(part, closestEnemy, 0) -- Начало касания
+                            task.wait(0.05)
+                            firetouchinterest(part, closestEnemy, 1) -- Конец касания
+                        end)
+                    end
                 end
-            end
-        end)
+            end)
+        end
     end
 end
 
