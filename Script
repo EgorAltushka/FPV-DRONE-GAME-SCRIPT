@@ -37,6 +37,9 @@ local extTPDroneEnabled, extRefillEnabled = false, false
 local thirdPersonEnabled = false
 local cameraZoom = 50
 
+-- ВЕРСИЯ СКРИПТА
+local SCRIPT_VERSION = "v2.6 (Clean TP)"
+
 local lang = {
     ru = {v="Визуал", m="Движение", f="Бой", mel="Меллстрой", misc="Разное", l="Язык", s="Настройки", inf="Инфо", p="Люди: ", d="Дроны: ", dist="Дистанция: ", opt="Оптимизация: ", time="Время: ", fly="Полет: ", spd="Скорость: ", fly_spd="Скор. полета: ", jmp="Прыжок: ", spin="Спин: ", warn="Включите ESP Дронов!", del="УДАЛИТЬ СКРИПТ", on="ВКЛ", off="ВЫКЛ", move_title="Движение", world_title="Мир / World", cam_title="Камера", fov="FOV: ", tp_cam="Третье лицо: ", zoom="Зум: ", fight_title="Бой / Fight", esp_title="ESP", sa="Aimlock: ", sa_t="Цель: ", sa_fov="FOV Aim: ", sa_pr="Предикт: ", sa_vis="Только видимые: ", t_people="Люди", t_drones="Дроны", t_both="Оба", cfg_name="Имя конфига:", cfg_save="СОХРАНИТЬ", cfg_load="ЗАГРУЗИТЬ", cfg_saved="Сохранено!", cfg_loaded="Загружено!", cfg_err="Ошибка!", tp_title="Телепорт", tp_plr="ТП к ближ. игроку", tp_drn="ТП к ближ. дрону", tp_drn_enemy="ТП Дрона", auto_tp="Авто-ТП дрона: ", ext_tp="Внешняя ТП: ", ext_drn="Внешняя ТП Дрона: ", ext_refill="Внешняя пополнение: ", ext_tp_info="(Только к людям)", other_title="Прочее", anti_afk="Anti-AFK: ", color="Цвет: ", wm="Водяной знак (FPS): ", weather="Погода: ", w_off="ВЫКЛ", w_snow="СНЕГ", w_rain="ДОЖДЬ", plist="Игроки (ТП):", refill="Пополнить дроны (ТП)", kf="Лог смертей: ", info_title="Мой Телеграм:", copy_msg="Ссылка скопирована!"},
     en = {v="Visuals", m="Movement", f="Fight", mel="Mellstroy", misc="Misc", l="Language", s="Settings", inf="Info", p="People: ", d="Drones: ", dist="Distance: ", opt="Optimization: ", time="Time: ", fly="Fly: ", spd="Speed: ", fly_spd="Fly Speed: ", jmp="Jump: ", spin="Spin: ", warn="Enable Drone ESP!", del="DELETE SCRIPT", on="ON", off="OFF", move_title="Movement", world_title="World", cam_title="Camera", fov="FOV: ", tp_cam="Third Person: ", zoom="Zoom: ", fight_title="Fight", esp_title="ESP", sa="Aimlock: ", sa_t="Target: ", sa_fov="FOV Aim: ", sa_pr="Predict: ", sa_vis="Only Visible: ", t_people="People", t_drones="Drones", t_both="Both", cfg_name="Config Name:", cfg_save="SAVE", cfg_load="LOAD", cfg_saved="Saved!", cfg_loaded="Loaded!", cfg_err="Error!", tp_title="Teleport", tp_plr="TP to nearest player", tp_drn="TP to nearest drone", tp_drn_enemy="TP Drone", auto_tp="Auto-TP drone: ", ext_tp="External TP: ", ext_drn="Ext TP Drone: ", ext_refill="Ext Refill: ", ext_tp_info="(People only)", other_title="Other", anti_afk="Anti-AFK: ", color="Color: ", wm="Watermark (FPS): ", weather="Weather: ", w_off="OFF", w_snow="SNOW", w_rain="RAIN", plist="Players (TP):", refill="Refill drones (TP)", kf="Kill Feed: ", info_title="My Telegram:", copy_msg="Link copied!"}
@@ -53,10 +56,10 @@ end
 local loadGui = create("ScreenGui", {Name="LoadGui", ResetOnSpawn=false, IgnoreGuiInset=true}, CoreGui)
 local loadFrame = create("Frame", {Size=UDim2.new(1,0,1,0), BackgroundColor3=Color3.fromRGB(15,15,20), BorderSizePixel=0, ZIndex=100}, loadGui)
 create("TextLabel", {Size=UDim2.new(1,0,0,60), Position=UDim2.new(0,0,0.5,-30), BackgroundTransparency=1, Text="pidorashub", TextColor3=Color3.fromRGB(255,255,255), Font=Enum.Font.GothamBold, TextSize=48, ZIndex=101}, loadFrame)
-create("TextLabel", {Size=UDim2.new(1,0,0,20), Position=UDim2.new(0,0,0.5,30), BackgroundTransparency=1, Text="Загрузка модулей...", TextColor3=Color3.fromRGB(150,150,150), Font=Enum.Font.Gotham, TextSize=16, ZIndex=101}, loadFrame)
+create("TextLabel", {Size=UDim2.new(1,0,0,20), Position=UDim2.new(0,0,0.5,30), BackgroundTransparency=1, Text="Версия: "..SCRIPT_VERSION, TextColor3=Color3.fromRGB(150,150,150), Font=Enum.Font.Gotham, TextSize=16, ZIndex=101}, loadFrame)
 
 local gui = create("ScreenGui", {Name="ESP_GUI", ResetOnSpawn=false, Enabled=false, IgnoreGuiInset=true}, CoreGui)
-local watermark = create("TextLabel", {Size=UDim2.new(0,200,0,20), Position=UDim2.new(0.5,-100,0,10), BackgroundTransparency=1, Text="pidorashub | FPS: 60", TextColor3=Color3.fromRGB(255,255,255), Font=Enum.Font.GothamBold, TextSize=14, TextXAlignment=Enum.TextXAlignment.Center, ZIndex=100, Visible=false}, gui)
+local watermark = create("TextLabel", {Size=UDim2.new(0,250,0,20), Position=UDim2.new(0.5,-125,0,10), BackgroundTransparency=1, Text="pidorashub "..SCRIPT_VERSION.." | FPS: 60", TextColor3=Color3.fromRGB(255,255,255), Font=Enum.Font.GothamBold, TextSize=14, TextXAlignment=Enum.TextXAlignment.Center, ZIndex=100, Visible=false}, gui)
 local killFeedFrame = create("Frame", {Size=UDim2.new(0,300,0,200), Position=UDim2.new(1,-20,0,60), AnchorPoint=Vector2.new(1,0), BackgroundTransparency=1, ZIndex=90}, gui)
 create("UIListLayout", {Padding=UDim.new(0,5), SortOrder=Enum.SortOrder.LayoutOrder, HorizontalAlignment=Enum.HorizontalAlignment.Right, VerticalAlignment=Enum.VerticalAlignment.Top}, killFeedFrame)
 
@@ -73,7 +76,7 @@ create("UIStroke", {Color=Color3.fromRGB(60,60,70), Thickness=1.5}, main)
 local topBar = create("Frame", {Size=UDim2.new(1,0,0,35), BackgroundColor3=Color3.fromRGB(30,30,40), BorderSizePixel=0}, main)
 create("UICorner", {CornerRadius=UDim.new(0,10)}, topBar)
 create("Frame", {Size=UDim2.new(1,0,0,15), Position=UDim2.new(0,0,1,-15), BackgroundColor3=Color3.fromRGB(30,30,40), BorderSizePixel=0}, topBar)
-create("TextLabel", {Size=UDim2.new(1,-40,1,0), Position=UDim2.new(0,15,0,0), BackgroundTransparency=1, Text="pidorashub", TextColor3=Color3.fromRGB(255,255,255), Font=Enum.Font.GothamBold, TextSize=14, TextXAlignment=Enum.TextXAlignment.Left}, topBar)
+create("TextLabel", {Size=UDim2.new(1,-40,1,0), Position=UDim2.new(0,15,0,0), BackgroundTransparency=1, Text="Pidhub "..SCRIPT_VERSION, TextColor3=Color3.fromRGB(255,255,255), Font=Enum.Font.GothamBold, TextSize=14, TextXAlignment=Enum.TextXAlignment.Left}, topBar)
 local closeBtn = create("TextButton", {Size=UDim2.new(0,25,0,25), Position=UDim2.new(1,-30,0,5), BackgroundTransparency=1, Text="-", TextColor3=Color3.fromRGB(255,100,100), Font=Enum.Font.GothamBold, TextSize=20}, topBar)
 
 local menuBtn = create("TextButton", {Size=UDim2.new(0,65,0,65), Position=UDim2.new(0,20,0.5,-32), BackgroundTransparency=1, Text="", BorderSizePixel=0, Visible=false, ZIndex=100, ClipsDescendants=true}, gui)
@@ -485,7 +488,7 @@ btnTpDrn.MouseButton1Click:Connect(function()
     if bestPos then myChar.HumanoidRootPart.CFrame = CFrame.new(bestPos + Vector3.new(0, 3, 0)) end
 end)
 
--- ФИКС: УДАЛЯЕМ СТАБИЛИЗАТОРЫ И ТЕЛЕПОРТИРУЕМ
+-- ЧИСТЫЙ ТЕЛЕПОРТ ДРОНА (БЕЗ ВСЯКОЙ ХУЙНИ)
 local function tpDroneToEnemy(specificDrone)
     local myChar = LP.Character
     if not myChar or not myChar:FindFirstChild("HumanoidRootPart") then return end
@@ -528,34 +531,8 @@ local function tpDroneToEnemy(specificDrone)
     end
     
     if myDrone then
-        local body = myDrone:FindFirstChild("Body") or myDrone.PrimaryPart or myDrone:FindFirstChildWhichIsA("BasePart")
-        if body then
-            -- 1. Уничтожаем все стабилизаторы, чтобы дрон не улетал вверх и не сопротивлялся ТП
-            for _, child in pairs(myDrone:GetDescendants()) do
-                if child:IsA("BodyVelocity") or child:IsA("BodyGyro") or child:IsA("AlignPosition") or child:IsA("AlignOrientation") then
-                    child:Destroy()
-                end
-            end
-            
-            -- 2. Телепортируем прямо в игрока
-            myDrone:PivotTo(CFrame.new(closestEnemy.Position))
-            
-            -- 3. Ждем долю секунды, чтобы сервер понял, что дрон переместился
-            task.wait(0.25)
-            
-            -- 4. Вызываем Touched для всех частей тела врага и детали Body дрона
-            task.spawn(function()
-                for _, targetPart in pairs(closestEnemy.Parent:GetDescendants()) do
-                    if targetPart:IsA("BasePart") then
-                        pcall(function()
-                            firetouchinterest(body, targetPart, 0)
-                            task.wait()
-                            firetouchinterest(body, targetPart, 1)
-                        end)
-                    end
-                end
-            end)
-        end
+        -- ТОЛЬКО ТЕЛЕПОРТ, БЕЗ СТАБИЛИЗАТОРОВ И ТАЧЕЙ
+        myDrone:PivotTo(CFrame.new(closestEnemy.Position))
     end
 end
 
@@ -739,7 +716,7 @@ end)
 
 local frames = 0; local lastTime = os.clock()
 table.insert(conns, RunService.RenderStepped:Connect(function()
-    if wmEnabled then frames = frames + 1; if os.clock() - lastTime >= 1 then local fps = frames; frames = 0; lastTime = os.clock(); watermark.Text = "pidorashub | FPS: "..fps end end
+    if wmEnabled then frames = frames + 1; if os.clock() - lastTime >= 1 then local fps = frames; frames = 0; lastTime = os.clock(); watermark.Text = "pidorashub "..SCRIPT_VERSION.." | FPS: "..fps end end
 end))
 
 local dragging, dragStart, startPos
