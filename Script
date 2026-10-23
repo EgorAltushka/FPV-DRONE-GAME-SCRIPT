@@ -485,6 +485,7 @@ btnTpDrn.MouseButton1Click:Connect(function()
     if bestPos then myChar.HumanoidRootPart.CFrame = CFrame.new(bestPos + Vector3.new(0, 3, 0)) end
 end)
 
+-- ОБНОВЛЕННАЯ ФУНКЦИЯ ТП И ВЗРЫВА ДРОНА (С firetouchinterest)
 local function tpDroneToEnemy(specificDrone)
     local myChar = LP.Character
     if not myChar or not myChar:FindFirstChild("HumanoidRootPart") then return end
@@ -527,16 +528,24 @@ local function tpDroneToEnemy(specificDrone)
     end
     
     if myDrone then
-        -- ФИКС УРОНА: Телепортируем выше и даем скорость вниз
-        local spawnPos = closestEnemy.Position + Vector3.new(0, 4, 0)
+        -- 1. Телепортируем дрон прямо в игрока
+        myDrone:PivotTo(CFrame.new(closestEnemy.Position))
         
-        myDrone:PivotTo(CFrame.new(spawnPos))
+        -- 2. Ждем 0.1 сек (чтобы физика прогрузилась)
+        task.wait(0.1)
         
-        for _, part in pairs(myDrone:GetDescendants()) do
-            if part:IsA("BasePart") then
-                part.AssemblyLinearVelocity = Vector3.new(0, -200, 0) -- Резко вниз
+        -- 3. Эмулируем Touched (касание)
+        task.spawn(function()
+            for _, part in pairs(myDrone:GetDescendants()) do
+                if part:IsA("BasePart") then
+                    pcall(function()
+                        firetouchinterest(part, closestEnemy, 0) -- Начало касания
+                        task.wait(0.05)
+                        firetouchinterest(part, closestEnemy, 1) -- Конец касания
+                    end)
+                end
             end
-        end
+        end)
     end
 end
 
@@ -855,14 +864,12 @@ local updateESP = function()
         else local bv = myChar.HumanoidRootPart:FindFirstChild("FlyBV"); if bv then bv:Destroy() end end
     end
 
-    -- ФИКС 3 ЛИЦА: Принудительно включаем и скрываем руки от 1 лица
     if thirdPersonEnabled then
         if LP.CameraMode ~= Enum.CameraMode.Classic then
             LP.CameraMode = Enum.CameraMode.Classic
             LP.CameraMaxZoomDistance = cameraZoom
             LP.CameraMinZoomDistance = cameraZoom
         end
-        -- Скрываем фейковые руки/оружие от 1 лица
         for _, obj in pairs(Cam:GetChildren()) do
             if obj:IsA("Model") or obj:IsA("BasePart") then
                 for _, p in pairs(obj:GetDescendants()) do
@@ -872,7 +879,6 @@ local updateESP = function()
                 end
             end
         end
-        -- Возвращаем видимость настоящему оружию в руках
         if myChar then
             for _, tool in pairs(myChar:GetChildren()) do
                 if tool:IsA("Tool") then
