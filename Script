@@ -32,11 +32,11 @@ local aimPrediction = 0.1
 local aimCurrentTarget = nil
 local extTPEnabled = false
 local autoTpDroneEnabled = false
-local extTPDroneEnemyEnabled, extTPDronePlrEnabled = false, false
+local extTPDroneEnabled, extRefillEnabled = false, false
 
 local lang = {
-    ru = {v="Визуал", m="Движение", f="Бой", mel="Меллстрой", misc="Разное", l="Язык", s="Настройки", inf="Инфо", p="Люди: ", d="Дроны: ", dist="Дистанция: ", opt="Оптимизация: ", time="Время: ", fly="Полет: ", spd="Скорость: ", fly_spd="Скор. полета: ", jmp="Прыжок: ", spin="Спин: ", warn="Включите ESP Дронов!", del="УДАЛИТЬ СКРИПТ", on="ВКЛ", off="ВЫКЛ", move_title="Движение", world_title="Мир / World", cam_title="Камера", fov="FOV: ", fight_title="Бой / Fight", esp_title="ESP", sa="Aimlock: ", sa_t="Цель: ", sa_fov="FOV Aim: ", sa_pr="Предикт: ", sa_vis="Только видимые: ", t_people="Люди", t_drones="Дроны", t_both="Оба", cfg_name="Имя конфига:", cfg_save="СОХРАНИТЬ", cfg_load="ЗАГРУЗИТЬ", cfg_saved="Сохранено!", cfg_loaded="Загружено!", cfg_err="Ошибка!", tp_title="Телепорт", tp_plr="ТП к ближ. игроку", tp_drn="ТП к ближ. дрону", tp_drn_enemy="ТП Дрона к Врагу", tp_drn_plr="ТП Дрона к Игроку", auto_tp="Авто-ТП дрона: ", ext_tp="Внешняя ТП: ", ext_drn_enemy="Внешняя ТП Дрона (Враг): ", ext_drn_plr="Внешняя ТП Дрона (Игрок): ", ext_tp_info="(Только к людям)", other_title="Прочее", anti_afk="Anti-AFK: ", color="Цвет: ", wm="Водяной знак (FPS): ", weather="Погода: ", w_off="ВЫКЛ", w_snow="СНЕГ", w_rain="ДОЖДЬ", plist="Игроки (ТП):", refill="Пополнить дроны (ТП)", kf="Лог смертей: ", info_title="Мой Телеграм:", copy_msg="Ссылка скопирована!"},
-    en = {v="Visuals", m="Movement", f="Fight", mel="Mellstroy", misc="Misc", l="Language", s="Settings", inf="Info", p="People: ", d="Drones: ", dist="Distance: ", opt="Optimization: ", time="Time: ", fly="Fly: ", spd="Speed: ", fly_spd="Fly Speed: ", jmp="Jump: ", spin="Spin: ", warn="Enable Drone ESP!", del="DELETE SCRIPT", on="ON", off="OFF", move_title="Movement", world_title="World", cam_title="Camera", fov="FOV: ", fight_title="Fight", esp_title="ESP", sa="Aimlock: ", sa_t="Target: ", sa_fov="FOV Aim: ", sa_pr="Predict: ", sa_vis="Only Visible: ", t_people="People", t_drones="Drones", t_both="Both", cfg_name="Config Name:", cfg_save="SAVE", cfg_load="LOAD", cfg_saved="Saved!", cfg_loaded="Loaded!", cfg_err="Error!", tp_title="Teleport", tp_plr="TP to nearest player", tp_drn="TP to nearest drone", tp_drn_enemy="TP Drone to Enemy", tp_drn_plr="TP Drone to Player", auto_tp="Auto-TP drone: ", ext_tp="External TP: ", ext_drn_enemy="Ext TP Drone (Enemy): ", ext_drn_plr="Ext TP Drone (Player): ", ext_tp_info="(People only)", other_title="Other", anti_afk="Anti-AFK: ", color="Color: ", wm="Watermark (FPS): ", weather="Weather: ", w_off="OFF", w_snow="SNOW", w_rain="RAIN", plist="Players (TP):", refill="Refill drones (TP)", kf="Kill Feed: ", info_title="My Telegram:", copy_msg="Link copied!"}
+    ru = {v="Визуал", m="Движение", f="Бой", mel="Меллстрой", misc="Разное", l="Язык", s="Настройки", inf="Инфо", p="Люди: ", d="Дроны: ", dist="Дистанция: ", opt="Оптимизация: ", time="Время: ", fly="Полет: ", spd="Скорость: ", fly_spd="Скор. полета: ", jmp="Прыжок: ", spin="Спин: ", warn="Включите ESP Дронов!", del="УДАЛИТЬ СКРИПТ", on="ВКЛ", off="ВЫКЛ", move_title="Движение", world_title="Мир / World", cam_title="Камера", fov="FOV: ", fight_title="Бой / Fight", esp_title="ESP", sa="Aimlock: ", sa_t="Цель: ", sa_fov="FOV Aim: ", sa_pr="Предикт: ", sa_vis="Только видимые: ", t_people="Люди", t_drones="Дроны", t_both="Оба", cfg_name="Имя конфига:", cfg_save="СОХРАНИТЬ", cfg_load="ЗАГРУЗИТЬ", cfg_saved="Сохранено!", cfg_loaded="Загружено!", cfg_err="Ошибка!", tp_title="Телепорт", tp_plr="ТП к ближ. игроку", tp_drn="ТП к ближ. дрону", tp_drn_enemy="ТП Дрона", auto_tp="Авто-ТП дрона: ", ext_tp="Внешняя ТП: ", ext_drn="Внешняя ТП Дрона: ", ext_refill="Внешняя пополнение: ", ext_tp_info="(Только к людям)", other_title="Прочее", anti_afk="Anti-AFK: ", color="Цвет: ", wm="Водяной знак (FPS): ", weather="Погода: ", w_off="ВЫКЛ", w_snow="СНЕГ", w_rain="ДОЖДЬ", plist="Игроки (ТП):", refill="Пополнить дроны (ТП)", kf="Лог смертей: ", info_title="Мой Телеграм:", copy_msg="Ссылка скопирована!"},
+    en = {v="Visuals", m="Movement", f="Fight", mel="Mellstroy", misc="Misc", l="Language", s="Settings", inf="Info", p="People: ", d="Drones: ", dist="Distance: ", opt="Optimization: ", time="Time: ", fly="Fly: ", spd="Speed: ", fly_spd="Fly Speed: ", jmp="Jump: ", spin="Spin: ", warn="Enable Drone ESP!", del="DELETE SCRIPT", on="ON", off="OFF", move_title="Movement", world_title="World", cam_title="Camera", fov="FOV: ", fight_title="Fight", esp_title="ESP", sa="Aimlock: ", sa_t="Target: ", sa_fov="FOV Aim: ", sa_pr="Predict: ", sa_vis="Only Visible: ", t_people="People", t_drones="Drones", t_both="Both", cfg_name="Config Name:", cfg_save="SAVE", cfg_load="LOAD", cfg_saved="Saved!", cfg_loaded="Loaded!", cfg_err="Error!", tp_title="Teleport", tp_plr="TP to nearest player", tp_drn="TP to nearest drone", tp_drn_enemy="TP Drone", auto_tp="Auto-TP drone: ", ext_tp="External TP: ", ext_drn="Ext TP Drone: ", ext_refill="Ext Refill: ", ext_tp_info="(People only)", other_title="Other", anti_afk="Anti-AFK: ", color="Color: ", wm="Watermark (FPS): ", weather="Weather: ", w_off="OFF", w_snow="SNOW", w_rain="RAIN", plist="Players (TP):", refill="Refill drones (TP)", kf="Kill Feed: ", info_title="My Telegram:", copy_msg="Link copied!"}
 }
 local function L(k) return lang[currentLang][k] end
 
@@ -192,34 +192,33 @@ local btnMell = create("TextButton", {Size=UDim2.new(0,220,0,35), Position=UDim2
 local lblTpTitle = create("TextLabel", {Size=UDim2.new(1,0,0,30), BackgroundTransparency=1, Text="Телепорт", TextColor3=Color3.new(1,1,1), Font=Enum.Font.GothamBold, TextSize=14, LayoutOrder=1}, pageMisc)
 local btnTpPlr = create("TextButton", {Size=UDim2.new(0,220,0,35), BackgroundColor3=Color3.fromRGB(50,50,60), Text="ТП к ближ. игроку", TextColor3=Color3.new(1,1,1), Font=Enum.Font.GothamBold, TextSize=13, BorderSizePixel=0, LayoutOrder=2}, pageMisc); create("UICorner", {CornerRadius=UDim.new(0,6)}, btnTpPlr)
 local btnTpDrn = create("TextButton", {Size=UDim2.new(0,220,0,35), BackgroundColor3=Color3.fromRGB(50,50,60), Text="ТП к ближ. дрону", TextColor3=Color3.new(1,1,1), Font=Enum.Font.GothamBold, TextSize=13, BorderSizePixel=0, LayoutOrder=3}, pageMisc); create("UICorner", {CornerRadius=UDim.new(0,6)}, btnTpDrn)
-local btnTpDroneEnemy = create("TextButton", {Size=UDim2.new(0,220,0,35), BackgroundColor3=Color3.fromRGB(200,50,50), Text="ТП Дрона к Врагу", TextColor3=Color3.new(1,1,1), Font=Enum.Font.GothamBold, TextSize=13, BorderSizePixel=0, LayoutOrder=4}, pageMisc); create("UICorner", {CornerRadius=UDim.new(0,6)}, btnTpDroneEnemy)
-local btnTpDronePlr = create("TextButton", {Size=UDim2.new(0,220,0,35), BackgroundColor3=Color3.fromRGB(50,150,255), Text="ТП Дрона к Игроку", TextColor3=Color3.new(1,1,1), Font=Enum.Font.GothamBold, TextSize=13, BorderSizePixel=0, LayoutOrder=5}, pageMisc); create("UICorner", {CornerRadius=UDim.new(0,6)}, btnTpDronePlr)
-local btnAutoTpDrone = create("TextButton", {Size=UDim2.new(0,220,0,35), BackgroundColor3=Color3.fromRGB(100,100,100), Text="Авто-ТП дрона: ВЫКЛ", TextColor3=Color3.new(1,1,1), Font=Enum.Font.GothamBold, TextSize=13, BorderSizePixel=0, LayoutOrder=6}, pageMisc); create("UICorner", {CornerRadius=UDim.new(0,6)}, btnAutoTpDrone)
-local btnRefillDrones = create("TextButton", {Size=UDim2.new(0,220,0,35), BackgroundColor3=Color3.fromRGB(0,150,255), Text="Пополнить дроны (ТП)", TextColor3=Color3.new(1,1,1), Font=Enum.Font.GothamBold, TextSize=13, BorderSizePixel=0, LayoutOrder=7}, pageMisc); create("UICorner", {CornerRadius=UDim.new(0,6)}, btnRefillDrones)
+local btnTpDroneEnemy = create("TextButton", {Size=UDim2.new(0,220,0,35), BackgroundColor3=Color3.fromRGB(50,50,60), Text="ТП Дрона", TextColor3=Color3.new(1,1,1), Font=Enum.Font.GothamBold, TextSize=13, BorderSizePixel=0, LayoutOrder=4}, pageMisc); create("UICorner", {CornerRadius=UDim.new(0,6)}, btnTpDroneEnemy)
+local btnAutoTpDrone = create("TextButton", {Size=UDim2.new(0,220,0,35), BackgroundColor3=Color3.fromRGB(100,100,100), Text="Авто-ТП дрона: ВЫКЛ", TextColor3=Color3.new(1,1,1), Font=Enum.Font.GothamBold, TextSize=13, BorderSizePixel=0, LayoutOrder=5}, pageMisc); create("UICorner", {CornerRadius=UDim.new(0,6)}, btnAutoTpDrone)
+local btnRefillDrones = create("TextButton", {Size=UDim2.new(0,220,0,35), BackgroundColor3=Color3.fromRGB(50,50,60), Text="Пополнить дроны (ТП)", TextColor3=Color3.new(1,1,1), Font=Enum.Font.GothamBold, TextSize=13, BorderSizePixel=0, LayoutOrder=6}, pageMisc); create("UICorner", {CornerRadius=UDim.new(0,6)}, btnRefillDrones)
 
-local btnToggleExtTP = create("TextButton", {Size=UDim2.new(0,220,0,35), BackgroundColor3=Color3.fromRGB(100,100,100), Text="Внешняя ТП: ВЫКЛ", TextColor3=Color3.new(1,1,1), Font=Enum.Font.GothamBold, TextSize=13, BorderSizePixel=0, LayoutOrder=8}, pageMisc); create("UICorner", {CornerRadius=UDim.new(0,6)}, btnToggleExtTP)
-local btnToggleExtDroneEnemy = create("TextButton", {Size=UDim2.new(0,220,0,35), BackgroundColor3=Color3.fromRGB(100,100,100), Text="Внешняя ТП Дрона (Враг): ВЫКЛ", TextColor3=Color3.new(1,1,1), Font=Enum.Font.GothamBold, TextSize=13, BorderSizePixel=0, LayoutOrder=9}, pageMisc); create("UICorner", {CornerRadius=UDim.new(0,6)}, btnToggleExtDroneEnemy)
-local btnToggleExtDronePlr = create("TextButton", {Size=UDim2.new(0,220,0,35), BackgroundColor3=Color3.fromRGB(100,100,100), Text="Внешняя ТП Дрона (Игрок): ВЫКЛ", TextColor3=Color3.new(1,1,1), Font=Enum.Font.GothamBold, TextSize=13, BorderSizePixel=0, LayoutOrder=10}, pageMisc); create("UICorner", {CornerRadius=UDim.new(0,6)}, btnToggleExtDronePlr)
+local btnToggleExtTP = create("TextButton", {Size=UDim2.new(0,220,0,35), BackgroundColor3=Color3.fromRGB(100,100,100), Text="Внешняя ТП: ВЫКЛ", TextColor3=Color3.new(1,1,1), Font=Enum.Font.GothamBold, TextSize=13, BorderSizePixel=0, LayoutOrder=7}, pageMisc); create("UICorner", {CornerRadius=UDim.new(0,6)}, btnToggleExtTP)
+local btnToggleExtDrone = create("TextButton", {Size=UDim2.new(0,220,0,35), BackgroundColor3=Color3.fromRGB(100,100,100), Text="Внешняя ТП Дрона: ВЫКЛ", TextColor3=Color3.new(1,1,1), Font=Enum.Font.GothamBold, TextSize=13, BorderSizePixel=0, LayoutOrder=8}, pageMisc); create("UICorner", {CornerRadius=UDim.new(0,6)}, btnToggleExtDrone)
+local btnToggleExtRefill = create("TextButton", {Size=UDim2.new(0,220,0,35), BackgroundColor3=Color3.fromRGB(100,100,100), Text="Внешнее Пополнение: ВЫКЛ", TextColor3=Color3.new(1,1,1), Font=Enum.Font.GothamBold, TextSize=13, BorderSizePixel=0, LayoutOrder=9}, pageMisc); create("UICorner", {CornerRadius=UDim.new(0,6)}, btnToggleExtRefill)
 
-local lblExtTpInfo = create("TextLabel", {Size=UDim2.new(0,220,0,15), BackgroundTransparency=1, Text="(Только к людям)", TextColor3=Color3.fromRGB(150,150,150), Font=Enum.Font.Gotham, TextSize=11, TextXAlignment=Enum.TextXAlignment.Center, LayoutOrder=11}, pageMisc)
-local lblPList = create("TextLabel", {Size=UDim2.new(0,220,0,20), BackgroundTransparency=1, Text="Игроки (ТП):", TextColor3=Color3.fromRGB(200,200,200), Font=Enum.Font.GothamBold, TextSize=12, TextXAlignment=Enum.TextXAlignment.Left, LayoutOrder=12}, pageMisc)
-local playerListFrame = create("ScrollingFrame", {Size=UDim2.new(0,220,0,150), BackgroundColor3=Color3.fromRGB(30,30,40), BorderSizePixel=0, ScrollBarThickness=2, CanvasSize=UDim2.new(0,0,0,0), AutomaticCanvasSize=Enum.AutomaticSize.Y, LayoutOrder=13}, pageMisc)
+local lblExtTpInfo = create("TextLabel", {Size=UDim2.new(0,220,0,15), BackgroundTransparency=1, Text="(Только к людям)", TextColor3=Color3.fromRGB(150,150,150), Font=Enum.Font.Gotham, TextSize=11, TextXAlignment=Enum.TextXAlignment.Center, LayoutOrder=10}, pageMisc)
+local lblPList = create("TextLabel", {Size=UDim2.new(0,220,0,20), BackgroundTransparency=1, Text="Игроки (ТП):", TextColor3=Color3.fromRGB(200,200,200), Font=Enum.Font.GothamBold, TextSize=12, TextXAlignment=Enum.TextXAlignment.Left, LayoutOrder=11}, pageMisc)
+local playerListFrame = create("ScrollingFrame", {Size=UDim2.new(0,220,0,150), BackgroundColor3=Color3.fromRGB(30,30,40), BorderSizePixel=0, ScrollBarThickness=2, CanvasSize=UDim2.new(0,0,0,0), AutomaticCanvasSize=Enum.AutomaticSize.Y, LayoutOrder=12}, pageMisc)
 create("UICorner", {CornerRadius=UDim.new(0,6)}, playerListFrame)
 create("UIListLayout", {Padding=UDim.new(0,2), SortOrder=Enum.SortOrder.LayoutOrder}, playerListFrame)
 create("UIPadding", {PaddingTop=UDim.new(0,5), PaddingBottom=UDim.new(0,5), PaddingLeft=UDim.new(0,5), PaddingRight=UDim.new(0,5)}, playerListFrame)
 
--- ВНЕШНИЕ КНОПКИ ТП
+-- ВНЕШНИЕ КНОПКИ
 local extBtn = create("TextButton", {Size=UDim2.new(0,60,0,60), Position=UDim2.new(1,-80,0.5,-30), BackgroundColor3=Color3.fromRGB(0,150,80), Text="TP", TextColor3=Color3.new(1,1,1), Font=Enum.Font.GothamBold, TextSize=18, ZIndex=100, Visible=false}, gui)
 create("UICorner", {CornerRadius=UDim.new(1,0)}, extBtn)
 create("UIStroke", {Color=Color3.fromRGB(0,255,100), Thickness=2}, extBtn)
 
-local extDroneEnemyBtn = create("TextButton", {Size=UDim2.new(0,60,0,60), Position=UDim2.new(1,-80,0.5,40), BackgroundColor3=Color3.fromRGB(200,50,50), Text="D.Enemy", TextColor3=Color3.new(1,1,1), Font=Enum.Font.GothamBold, TextSize=12, ZIndex=100, Visible=false}, gui)
-create("UICorner", {CornerRadius=UDim.new(1,0)}, extDroneEnemyBtn)
-create("UIStroke", {Color=Color3.fromRGB(255,100,100), Thickness=2}, extDroneEnemyBtn)
+local extDroneBtn = create("TextButton", {Size=UDim2.new(0,60,0,60), Position=UDim2.new(1,-80,0.5,40), BackgroundColor3=Color3.fromRGB(200,50,50), Text="Drone", TextColor3=Color3.new(1,1,1), Font=Enum.Font.GothamBold, TextSize=13, ZIndex=100, Visible=false}, gui)
+create("UICorner", {CornerRadius=UDim.new(1,0)}, extDroneBtn)
+create("UIStroke", {Color=Color3.fromRGB(255,100,100), Thickness=2}, extDroneBtn)
 
-local extDronePlrBtn = create("TextButton", {Size=UDim2.new(0,60,0,60), Position=UDim2.new(1,-80,0.5,110), BackgroundColor3=Color3.fromRGB(50,150,255), Text="D.Player", TextColor3=Color3.new(1,1,1), Font=Enum.Font.GothamBold, TextSize=12, ZIndex=100, Visible=false}, gui)
-create("UICorner", {CornerRadius=UDim.new(1,0)}, extDronePlrBtn)
-create("UIStroke", {Color=Color3.fromRGB(100,200,255), Thickness=2}, extDronePlrBtn)
+local extRefillBtn = create("TextButton", {Size=UDim2.new(0,60,0,60), Position=UDim2.new(1,-80,0.5,110), BackgroundColor3=Color3.fromRGB(50,150,255), Text="Refill", TextColor3=Color3.new(1,1,1), Font=Enum.Font.GothamBold, TextSize=13, ZIndex=100, Visible=false}, gui)
+create("UICorner", {CornerRadius=UDim.new(1,0)}, extRefillBtn)
+create("UIStroke", {Color=Color3.fromRGB(100,200,255), Thickness=2}, extRefillBtn)
 
 -- LANGUAGE
 create("TextLabel", {Size=UDim2.new(1,0,0,30), Position=UDim2.new(0,0,0,10), BackgroundTransparency=1, Text="Язык / Language", TextColor3=Color3.new(1,1,1), Font=Enum.Font.GothamBold, TextSize=14}, pageLang)
@@ -281,17 +280,16 @@ function updateUI()
     flySpeedSliderBg.Visible = flyMode
     
     btnTpPlr.Text = L("tp_plr"); btnTpDrn.Text = L("tp_drn")
-    btnTpDroneEnemy.Text = L("tp_drn_enemy"); btnTpDronePlr.Text = L("tp_drn_plr")
+    btnTpDroneEnemy.Text = L("tp_drn_enemy")
     btnAutoTpDrone.Text = L("auto_tp")..(autoTpDroneEnabled and L("on") or L("off"))
     btnAutoTpDrone.BackgroundColor3 = autoTpDroneEnabled and Color3.fromRGB(0,150,80) or Color3.fromRGB(100,100,100)
     btnRefillDrones.Text = L("refill")
     btnToggleExtTP.Text = L("ext_tp")..(extTPEnabled and L("on") or L("off"))
     btnToggleExtTP.BackgroundColor3 = extTPEnabled and Color3.fromRGB(0,150,80) or Color3.fromRGB(100,100,100)
-
-    btnToggleExtDroneEnemy.Text = L("ext_drn_enemy")..(extTPDroneEnemyEnabled and L("on") or L("off"))
-    btnToggleExtDroneEnemy.BackgroundColor3 = extTPDroneEnemyEnabled and Color3.fromRGB(200,50,50) or Color3.fromRGB(100,100,100)
-    btnToggleExtDronePlr.Text = L("ext_drn_plr")..(extTPDronePlrEnabled and L("on") or L("off"))
-    btnToggleExtDronePlr.BackgroundColor3 = extTPDronePlrEnabled and Color3.fromRGB(50,150,255) or Color3.fromRGB(100,100,100)
+    btnToggleExtDrone.Text = L("ext_drn")..(extTPDroneEnabled and L("on") or L("off"))
+    btnToggleExtDrone.BackgroundColor3 = extTPDroneEnabled and Color3.fromRGB(0,150,80) or Color3.fromRGB(100,100,100)
+    btnToggleExtRefill.Text = L("ext_refill")..(extRefillEnabled and L("on") or L("off"))
+    btnToggleExtRefill.BackgroundColor3 = extRefillEnabled and Color3.fromRGB(0,150,80) or Color3.fromRGB(100,100,100)
 
     lblExtTpInfo.Text = L("ext_tp_info")
     lblPList.Text = L("plist")
@@ -344,8 +342,8 @@ btnAimVisible.MouseButton1Click:Connect(function() aimVisibleOnly = not aimVisib
 btnSpin.MouseButton1Click:Connect(function() spinEnabled = not spinEnabled; updateUI() end)
 
 btnToggleExtTP.MouseButton1Click:Connect(function() extTPEnabled = not extTPEnabled; extBtn.Visible = extTPEnabled; updateUI() end)
-btnToggleExtDroneEnemy.MouseButton1Click:Connect(function() extTPDroneEnemyEnabled = not extTPDroneEnemyEnabled; extDroneEnemyBtn.Visible = extTPDroneEnemyEnabled; updateUI() end)
-btnToggleExtDronePlr.MouseButton1Click:Connect(function() extTPDronePlrEnabled = not extTPDronePlrEnabled; extDronePlrBtn.Visible = extTPDronePlrEnabled; updateUI() end)
+btnToggleExtDrone.MouseButton1Click:Connect(function() extTPDroneEnabled = not extTPDroneEnabled; extDroneBtn.Visible = extTPDroneEnabled; updateUI() end)
+btnToggleExtRefill.MouseButton1Click:Connect(function() extRefillEnabled = not extRefillEnabled; extRefillBtn.Visible = extRefillEnabled; updateUI() end)
 
 btnAntiAfly.MouseButton1Click:Connect(function() antiAfkEnabled = not antiAfkEnabled; updateUI() end)
 btnWatermark.MouseButton1Click:Connect(function() wmEnabled = not wmEnabled; watermark.Visible = wmEnabled; updateUI() end)
@@ -385,7 +383,6 @@ end
 
 btnWeather.MouseButton1Click:Connect(function() weatherMode = (weatherMode + 1) % 3; applyWeather(); updateUI() end)
 
--- ДИНАМИЧЕСКИЙ СПИСОК ИГРОКОВ
 local function updatePlayerList()
     for _, child in ipairs(playerListFrame:GetChildren()) do
         if child:IsA("TextButton") then child:Destroy() end
@@ -457,16 +454,16 @@ local function tpDroneToEnemy(specificDrone)
     local closestEnemy = nil
     local shortestDist = math.huge
     for _, p in ipairs(Players:GetPlayers()) do
-        if p ~= LP and (p.Team == nil or p.Team ~= LP.Team) and p.Character then
+        if p ~= LP and p.Character then
+            local hum = p.Character:FindFirstChildOfClass("Humanoid")
             local eHrp = p.Character:FindFirstChild("HumanoidRootPart") or p.Character:FindFirstChildWhichIsA("BasePart")
-            if eHrp then
-                local hum = p.Character:FindFirstChildOfClass("Humanoid")
-                if (hum and hum.Health > 0) or not hum then
-                    local dist = (eHrp.Position - myPos).Magnitude
-                    if dist < shortestDist then
-                        shortestDist = dist
-                        closestEnemy = eHrp
-                    end
+            
+            -- ФИКС 1: Ищем только ЖИВЫХ (hum.Health > 0)
+            if hum and hum.Health > 0 and eHrp then
+                local dist = (eHrp.Position - myPos).Magnitude
+                if dist < shortestDist then
+                    shortestDist = dist
+                    closestEnemy = eHrp
                 end
             end
         end
@@ -494,64 +491,13 @@ local function tpDroneToEnemy(specificDrone)
     if myDrone then
         local primary = myDrone.PrimaryPart or myDrone:FindFirstChildWhichIsA("BasePart")
         if primary then
-            primary.CFrame = CFrame.new(closestEnemy.Position + Vector3.new(0, 5, 0))
+            -- ФИКС 2: ТП прямо в игрока (без +5 по высоте)
+            primary.CFrame = CFrame.new(closestEnemy.Position)
         end
     end
 end
 
-local function tpDroneToPlayer()
-    local myChar = LP.Character
-    if not myChar or not myChar:FindFirstChild("HumanoidRootPart") then return end
-    local myPos = myChar.HumanoidRootPart.Position
-    
-    local closestPlayer = nil
-    local shortestDist = math.huge
-    for _, p in ipairs(Players:GetPlayers()) do
-        if p ~= LP and p.Character then
-            local eHrp = p.Character:FindFirstChild("HumanoidRootPart") or p.Character:FindFirstChildWhichIsA("BasePart")
-            if eHrp then
-                local dist = (eHrp.Position - myPos).Magnitude
-                if dist < shortestDist then
-                    shortestDist = dist
-                    closestPlayer = eHrp
-                end
-            end
-        end
-    end
-    
-    if not closestPlayer then return end
-    
-    local myDrone = nil
-    local shortestDroneDist = math.huge
-    for m, _ in pairs(drones) do
-        if m.Parent then
-            local primary = m.PrimaryPart or m:FindFirstChildWhichIsA("BasePart")
-            if primary then
-                local dist = (primary.Position - myPos).Magnitude
-                if dist < shortestDroneDist then
-                    shortestDroneDist = dist
-                    myDrone = m
-                end
-            end
-        end
-    end
-    
-    if myDrone then
-        local primary = myDrone.PrimaryPart or myDrone:FindFirstChildWhichIsA("BasePart")
-        if primary then
-            primary.CFrame = CFrame.new(closestPlayer.Position + Vector3.new(0, 5, 0))
-        end
-    end
-end
-
-btnTpDroneEnemy.MouseButton1Click:Connect(function() tpDroneToEnemy() end)
-btnTpDronePlr.MouseButton1Click:Connect(function() tpDroneToPlayer() end)
-btnAutoTpDrone.MouseButton1Click:Connect(function() 
-    autoTpDroneEnabled = not autoTpDroneEnabled
-    updateUI()
-end)
-
-btnRefillDrones.MouseButton1Click:Connect(function()
+local function refillDrones()
     local myChar = LP.Character; if not myChar or not myChar:FindFirstChild("HumanoidRootPart") then return end
     local myHRP = myChar.HumanoidRootPart; local oldCFrame = myHRP.CFrame
     task.spawn(function()
@@ -578,23 +524,26 @@ btnRefillDrones.MouseButton1Click:Connect(function()
             task.wait(0.1); myHRP.CFrame = oldCFrame
         end
     end)
+end
+
+btnTpDroneEnemy.MouseButton1Click:Connect(function() tpDroneToEnemy() end)
+btnAutoTpDrone.MouseButton1Click:Connect(function() 
+    autoTpDroneEnabled = not autoTpDroneEnabled
+    updateUI()
 end)
+btnRefillDrones.MouseButton1Click:Connect(refillDrones)
 
 -- Логика перетаскивания Внешних кнопок
-local function setupExtBtnDrag(btn)
+local function setupExtBtnDrag(btn, callback)
     local eDragging, eDragStart, eStartPos, eMoved
     btn.InputBegan:Connect(function(input) if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then eDragging = true; eMoved = false; eDragStart = input.Position; eStartPos = btn.Position end end)
     UIS.InputChanged:Connect(function(input) if eDragging and (input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch) then local delta = input.Position - eDragStart; if math.abs(delta.X) > 5 or math.abs(delta.Y) > 5 then eMoved = true end; btn.Position = UDim2.new(eStartPos.X.Scale, eStartPos.X.Offset + delta.X, eStartPos.Y.Scale, eStartPos.Y.Offset + delta.Y) end end)
-    UIS.InputEnded:Connect(function(input) if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then if eDragging and not eMoved then 
-        if btn == extBtn then tpPlayer() 
-        elseif btn == extDroneEnemyBtn then tpDroneToEnemy()
-        elseif btn == extDronePlrBtn then tpDroneToPlayer() end
-    end; eDragging = false end end)
+    UIS.InputEnded:Connect(function(input) if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then if eDragging and not eMoved then callback() end; eDragging = false end end)
 end
 
-setupExtBtnDrag(extBtn)
-setupExtBtnDrag(extDroneEnemyBtn)
-setupExtBtnDrag(extDronePlrBtn)
+setupExtBtnDrag(extBtn, tpPlayer)
+setupExtBtnDrag(extDroneBtn, function() tpDroneToEnemy() end)
+setupExtBtnDrag(extRefillBtn, refillDrones)
 
 local mDragging, mDragStart, mStartPos, mMoved = false, nil, nil, false
 local isMenuOpen = true
@@ -617,7 +566,7 @@ btnSaveConfig.MouseButton1Click:Connect(function()
     if name == "" or name == nil then cfgStatus.Text = "Введите имя!"; cfgStatus.TextColor3 = Color3.fromRGB(255,50,50); return end
     local success, err = pcall(function()
         if not isfolder("pidorashub_configs") then makefolder("pidorashub_configs") end
-        local data = maxDist.."|"..walkSpeedVal.."|"..fovValue.."|"..timeValue.."|"..aimFov.."|"..aimPrediction.."|"..pMode.."|"..dMode.."|"..aimTargetMode.."|"..tostring(aimVisibleOnly).."|"..tostring(spinEnabled).."|"..tostring(extTPEnabled).."|"..tostring(flySpeed).."|"..tostring(antiAfkEnabled).."|"..tostring(espColorMode).."|"..tostring(wmEnabled).."|"..tostring(weatherMode).."|"..tostring(killFeedEnabled).."|"..tostring(autoTpDroneEnabled).."|"..tostring(extTPDroneEnemyEnabled).."|"..tostring(extTPDronePlrEnabled)
+        local data = maxDist.."|"..walkSpeedVal.."|"..fovValue.."|"..timeValue.."|"..aimFov.."|"..aimPrediction.."|"..pMode.."|"..dMode.."|"..aimTargetMode.."|"..tostring(aimVisibleOnly).."|"..tostring(spinEnabled).."|"..tostring(extTPEnabled).."|"..tostring(flySpeed).."|"..tostring(antiAfkEnabled).."|"..tostring(espColorMode).."|"..tostring(wmEnabled).."|"..tostring(weatherMode).."|"..tostring(killFeedEnabled).."|"..tostring(autoTpDroneEnabled).."|"..tostring(extTPDroneEnabled).."|"..tostring(extRefillEnabled)
         writefile("pidorashub_configs/"..name..".txt", data)
     end)
     if success then cfgStatus.Text = L("cfg_saved"); cfgStatus.TextColor3 = Color3.fromRGB(0,255,0) else cfgStatus.Text = L("cfg_err"); cfgStatus.TextColor3 = Color3.fromRGB(255,50,50) end
@@ -651,8 +600,8 @@ btnLoadConfig.MouseButton1Click:Connect(function()
         if vals[17] then weatherMode = tonumber(vals[17]) or weatherMode; applyWeather() end
         if vals[18] then killFeedEnabled = vals[18] == "true" end
         if vals[19] then autoTpDroneEnabled = vals[19] == "true" end
-        if vals[20] then extTPDroneEnemyEnabled = vals[20] == "true"; extDroneEnemyBtn.Visible = extTPDroneEnemyEnabled end
-        if vals[21] then extTPDronePlrEnabled = vals[21] == "true"; extDronePlrBtn.Visible = extTPDronePlrEnabled end
+        if vals[20] then extTPDroneEnabled = vals[20] == "true"; extDroneBtn.Visible = extTPDroneEnabled end
+        if vals[21] then extRefillEnabled = vals[21] == "true"; extRefillBtn.Visible = extRefillEnabled end
         updateUI()
     end)
     if success then cfgStatus.Text = L("cfg_loaded"); cfgStatus.TextColor3 = Color3.fromRGB(0,255,0) else cfgStatus.Text = L("cfg_err"); cfgStatus.TextColor3 = Color3.fromRGB(255,50,50) end
