@@ -485,7 +485,7 @@ btnTpDrn.MouseButton1Click:Connect(function()
     if bestPos then myChar.HumanoidRootPart.CFrame = CFrame.new(bestPos + Vector3.new(0, 3, 0)) end
 end)
 
--- ФИКС: СЕТЕВОЙ ОВНЕР + ТЕЛЕПОРТ БЕЗ ФИЗИЧЕСКОГО БРЕДА
+-- НОВАЯ ФУНКЦИЯ ТЕЛЕПОРТА С УЧЕТОМ СКРИПТА RPGHit и ТОЧЕЧНЫМ КАСАНИЕМ
 local function tpDroneToEnemy(specificDrone)
     local myChar = LP.Character
     if not myChar or not myChar:FindFirstChild("HumanoidRootPart") then return end
@@ -515,7 +515,7 @@ local function tpDroneToEnemy(specificDrone)
         local shortestDroneDist = math.huge
         for m, _ in pairs(drones) do
             if m.Parent then
-                local primary = m.PrimaryPart or m:FindFirstChildWhichIsA("BasePart")
+                local primary = m.PrimaryPart or m:FindFirstChild("Body") or m:FindFirstChildWhichIsA("BasePart")
                 if primary then
                     local dist = (primary.Position - myPos).Magnitude
                     if dist < shortestDroneDist then
@@ -528,28 +528,23 @@ local function tpDroneToEnemy(specificDrone)
     end
     
     if myDrone then
-        local primary = myDrone.PrimaryPart or myDrone:FindFirstChildWhichIsA("BasePart")
-        if primary then
-            pcall(function()
-                -- Забираем сетевые права у сервера
-                primary:SetNetworkOwner(LP) 
-            end)
-
-            -- Телепортируем дрон прямо над целью
-            local spawnPos = closestEnemy.Position + Vector3.new(0, 2, 0)
-            myDrone:PivotTo(CFrame.new(spawnPos))
+        local body = myDrone:FindFirstChild("Body") or myDrone.PrimaryPart or myDrone:FindFirstChildWhichIsA("BasePart")
+        if body then
+            -- 1. Забираем права на физику себе, чтобы сервер не блокировал ТП
+            pcall(function() body:SetNetworkOwner(LP) end)
             
-            -- Ждем долю секунды, чтобы физика обновилась
-            task.wait(0.05)
-
-            -- Эмулируем касание для 100% срабатывания взрыва
+            -- 2. Телепортируем прямо в игрока (в его хитбокс)
+            myDrone:PivotTo(CFrame.new(closestEnemy.Position))
+            
+            -- 3. Вызываем Touched для ВСЕХ частей тела врага и детали Body дрона
             task.spawn(function()
-                for _, part in pairs(myDrone:GetDescendants()) do
-                    if part:IsA("BasePart") then
+                task.wait(0.05) -- Ждем физику
+                for _, targetPart in pairs(closestEnemy.Parent:GetDescendants()) do
+                    if targetPart:IsA("BasePart") then
                         pcall(function()
-                            firetouchinterest(part, closestEnemy, 0) -- Начало касания
-                            task.wait(0.05)
-                            firetouchinterest(part, closestEnemy, 1) -- Конец касания
+                            firetouchinterest(body, targetPart, 0) -- Начало касания
+                            task.wait()
+                            firetouchinterest(body, targetPart, 1) -- Конец касания
                         end)
                     end
                 end
@@ -788,7 +783,7 @@ local function setupDrn(m)
         d.HL = Instance.new("Highlight", m); d.HL.FillTransparency = 1; d.HL.OutlineColor = espColors[espColorMode]; d.HL.OutlineTransparency = 0.2
         d.BB = Instance.new("BillboardGui", m); d.BB.AlwaysOnTop = true; d.BB.Size = UDim2.new(0,100,0,25); d.BB.Enabled = false
         d.T3D = Instance.new("TextLabel", d.BB); d.T3D.BackgroundTransparency = 1; d.T3D.Size = UDim2.new(1,0,1,0); d.T3D.TextColor3 = Color3.fromRGB(255,200,0); d.T3D.Text = "ДРОН"; d.T3D.TextStrokeTransparency = 0.3; d.T3D.Font = Enum.Font.GothamBold; d.T3D.TextSize = 12
-        local pPart = m.PrimaryPart or m:FindFirstChildWhichIsA("BasePart")
+        local pPart = m.PrimaryPart or m:FindFirstChild("Body") or m:FindFirstChildWhichIsA("BasePart")
         if pPart then local mellBB = Instance.new("BillboardGui", pPart); mellBB.Name = "MellBB"; mellBB.AlwaysOnTop = true; mellBB.Size = UDim2.new(0,30,0,30); mellBB.StudsOffset = Vector3.new(0,0.5,0); mellBB.Enabled = false; local img = Instance.new("ImageLabel", mellBB); img.Size = UDim2.new(1,0,1,0); img.BackgroundTransparency = 1; img.Image = mellImgId; img.ImageTransparency = 0.3; img.ScaleType = Enum.ScaleType.Fit; d.MellBB = mellBB end
         d.Box2D = create2DBox(gui, espColors[espColorMode])
         drones[m] = d
@@ -835,7 +830,7 @@ local function getAimTarget()
     if aimTargetMode == 2 or aimTargetMode == 3 then
         for m, d in pairs(drones) do
             if m.Parent then
-                local primary = m.PrimaryPart or m:FindFirstChildWhichIsA("BasePart")
+                local primary = m.PrimaryPart or m:FindFirstChild("Body") or m:FindFirstChildWhichIsA("BasePart")
                 if primary then
                     local vel = primary.Velocity or Vector3.new(0,0,0)
                     local predictedPos = primary.Position + (vel * aimPrediction)
