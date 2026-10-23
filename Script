@@ -34,7 +34,6 @@ local extTPEnabled = false
 local autoTpDroneEnabled = false
 local extTPDroneEnabled, extRefillEnabled = false, false
 
--- НОВЫЕ ПЕРЕМЕННЫЕ ДЛЯ КАМЕРЫ
 local thirdPersonEnabled = false
 local cameraZoom = 50
 
@@ -150,7 +149,6 @@ local fovSliderBg = create("Frame", {Size=UDim2.new(0,220,0,6), BackgroundColor3
 local fovSliderFill = create("Frame", {Size=UDim2.new(0/50,0,1,0), BackgroundColor3=Color3.fromRGB(0,150,255), BorderSizePixel=0}, fovSliderBg); create("UICorner", {CornerRadius=UDim.new(0,3)}, fovSliderFill)
 local fovSliderKnob = create("Frame", {Size=UDim2.new(0,16,0,16), Position=UDim2.new(0/50,-8,0.5,-8), BackgroundColor3=Color3.new(1,1,1), BorderSizePixel=0, ZIndex=2}, fovSliderBg); create("UICorner", {CornerRadius=UDim.new(0,8)}, fovSliderKnob)
 
--- НОВЫЕ КНОПКИ КАМЕРЫ
 local btnThirdPerson = create("TextButton", {Size=UDim2.new(0,220,0,30), BackgroundColor3=Color3.fromRGB(100,100,100), Text="Третье лицо: ВЫКЛ", TextColor3=Color3.new(1,1,1), Font=Enum.Font.GothamBold, TextSize=12, BorderSizePixel=0, LayoutOrder=9}, pageVis); create("UICorner", {CornerRadius=UDim.new(0,6)}, btnThirdPerson)
 local zoomLabel = create("TextLabel", {Size=UDim2.new(0,220,0,20), BackgroundTransparency=1, Text="Зум: 50", TextColor3=Color3.fromRGB(200,200,200), Font=Enum.Font.Gotham, TextSize=12, TextXAlignment=Enum.TextXAlignment.Left, LayoutOrder=10, Visible=false}, pageVis)
 local zoomSliderBg = create("Frame", {Size=UDim2.new(0,220,0,6), BackgroundColor3=Color3.fromRGB(60,60,70), BorderSizePixel=0, LayoutOrder=11, Visible=false}, pageVis); create("UICorner", {CornerRadius=UDim.new(0,3)}, zoomSliderBg)
@@ -529,13 +527,15 @@ local function tpDroneToEnemy(specificDrone)
     end
     
     if myDrone then
-        local primary = myDrone.PrimaryPart or myDrone:FindFirstChildWhichIsA("BasePart")
-        if primary then
-            -- ФИКС УРОНА: Ставим дрон на 2.5 стада ВЫШЕ цели, чтобы он падал на неё
-            local spawnPos = closestEnemy.Position + Vector3.new(0, 2.5, 0)
-            
-            primary.CFrame = CFrame.new(spawnPos)
-            primary.AssemblyLinearVelocity = Vector3.new(0, 0, 0) -- Обнуляем скорость
+        -- ФИКС УРОНА: Телепортируем выше и даем скорость вниз
+        local spawnPos = closestEnemy.Position + Vector3.new(0, 4, 0)
+        
+        myDrone:PivotTo(CFrame.new(spawnPos))
+        
+        for _, part in pairs(myDrone:GetDescendants()) do
+            if part:IsA("BasePart") then
+                part.AssemblyLinearVelocity = Vector3.new(0, -200, 0) -- Резко вниз
+            end
         end
     end
 end
@@ -855,11 +855,35 @@ local updateESP = function()
         else local bv = myChar.HumanoidRootPart:FindFirstChild("FlyBV"); if bv then bv:Destroy() end end
     end
 
-    -- Принудительное удержание третьего лица (если игра пытается сбросить)
-    if thirdPersonEnabled and LP.CameraMode ~= Enum.CameraMode.Classic then
-        LP.CameraMode = Enum.CameraMode.Classic
-        LP.CameraMaxZoomDistance = cameraZoom
-        LP.CameraMinZoomDistance = cameraZoom
+    -- ФИКС 3 ЛИЦА: Принудительно включаем и скрываем руки от 1 лица
+    if thirdPersonEnabled then
+        if LP.CameraMode ~= Enum.CameraMode.Classic then
+            LP.CameraMode = Enum.CameraMode.Classic
+            LP.CameraMaxZoomDistance = cameraZoom
+            LP.CameraMinZoomDistance = cameraZoom
+        end
+        -- Скрываем фейковые руки/оружие от 1 лица
+        for _, obj in pairs(Cam:GetChildren()) do
+            if obj:IsA("Model") or obj:IsA("BasePart") then
+                for _, p in pairs(obj:GetDescendants()) do
+                    if p:IsA("BasePart") and p.LocalTransparencyModifier < 1 then
+                        p.LocalTransparencyModifier = 1
+                    end
+                end
+            end
+        end
+        -- Возвращаем видимость настоящему оружию в руках
+        if myChar then
+            for _, tool in pairs(myChar:GetChildren()) do
+                if tool:IsA("Tool") then
+                    for _, p in pairs(tool:GetDescendants()) do
+                        if p:IsA("BasePart") then
+                            p.LocalTransparencyModifier = 0
+                        end
+                    end
+                end
+            end
+        end
     end
 
     if weatherPart and weatherMode > 0 then weatherPart.Position = Cam.CFrame.Position + Vector3.new(0, 25, 0) end
