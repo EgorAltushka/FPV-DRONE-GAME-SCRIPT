@@ -458,7 +458,6 @@ local function tpDroneToEnemy(specificDrone)
             local hum = p.Character:FindFirstChildOfClass("Humanoid")
             local eHrp = p.Character:FindFirstChild("HumanoidRootPart") or p.Character:FindFirstChildWhichIsA("BasePart")
             
-            -- ФИКС 1: Ищем только ЖИВЫХ (hum.Health > 0)
             if hum and hum.Health > 0 and eHrp then
                 local dist = (eHrp.Position - myPos).Magnitude
                 if dist < shortestDist then
@@ -491,8 +490,12 @@ local function tpDroneToEnemy(specificDrone)
     if myDrone then
         local primary = myDrone.PrimaryPart or myDrone:FindFirstChildWhichIsA("BasePart")
         if primary then
-            -- ФИКС 2: ТП прямо в игрока (без +5 по высоте)
-            primary.CFrame = CFrame.new(closestEnemy.Position)
+            -- ФИКС УРОНА: Ставим дрон на 2.5 стада от игрока в сторону стрелка (тебя), чтобы не спавнить внутри хитбокса
+            local dirToShooter = (myPos - closestEnemy.Position).Unit
+            local spawnPos = closestEnemy.Position + (dirToShooter * 2.5)
+            
+            primary.CFrame = CFrame.new(spawnPos)
+            primary.AssemblyLinearVelocity = Vector3.new(0, 0, 0) -- Обнуляем скорость после ТП
         end
     end
 end
